@@ -217,10 +217,12 @@
         <h2>Ingresar OT</h2>
         <form id="formNuevaOT" onsubmit="registrarOT(event)">
           
-          <div class="form-group">
-            <label for="ordenTrabajo">N° Orden de Trabajo (OT)</label>
-            <input type="text" id="ordenTrabajo" placeholder="Ej: OT-1001" required>
-          </div>
+          <!-- Campo 1: Orden de Trabajo (Bloqueado) -->
+      <div class="form-group">
+        <label for="ordenTrabajo">Orden de Trabajo (OT)</label>
+        <input type="text" id="ordenTrabajo" name="ordenTrabajo" value="OT/0001" readonly class="readonly-input">
+      </div>
+
 
           <div class="form-group">
             <label for="mecanico">Mecánico</label>
