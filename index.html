@@ -121,7 +121,8 @@
     #formSection {
       display: none;
     }
-    #formSection form {
+    /* CORRECCIÓN CSS: Se aplica la grilla EXCLUSIVAMENTE al formulario visible */
+    #otForm {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 16px;
@@ -155,6 +156,17 @@
       border-radius: 8px;
       width: 90%;
       max-width: 450px;
+    }
+
+    /* OCULTAR FORMULARIO DE NETLIFY POR COMPLETO */
+    .hidden-netlify-form {
+      position: absolute !important;
+      width: 0 !important;
+      height: 0 !important;
+      overflow: hidden !important;
+      opacity: 0 !important;
+      pointer-events: none !important;
+      display: none !important;
     }
   </style>
 </head>
@@ -311,6 +323,24 @@
     </div>
   </div>
 
+  <!-- FORMULARIO OCULTO PARA NETLIFY -->
+  <div class="hidden-netlify-form">
+    <form name="otFormNetlify" data-netlify="true">
+      <input type="text" name="ordenTrabajo">
+      <input type="text" name="mecanico">
+      <input type="text" name="trabajoRealizar">
+      <input type="text" name="operacion">
+      <input type="text" name="maquinaTaller">
+      <input type="text" name="codMaq">
+      <input type="text" name="centroTrabajo">
+      <input type="text" name="maquinaSolicitante">
+      <input type="text" name="horaInicio">
+      <input type="text" name="horaFin">
+      <input type="text" name="totalTiempo">
+      <textarea name="observaciones"></textarea>
+    </form>
+  </div>
+
   <script>
     let ordenesAbiertas = JSON.parse(localStorage.getItem('ordenesAbiertas')) || [];
     let contadorOT = parseInt(localStorage.getItem('contadorOT')) || 1;
@@ -322,7 +352,6 @@
       document.getElementById('boardSection').style.display = 'none';
       document.getElementById('formSection').style.display = 'block';
       
-      // Generar correlativo OT/000X
       const formatoOT = "OT/" + contadorOT.toString().padStart(4, '0');
       document.getElementById('ordenTrabajo').value = formatoOT;
     }
@@ -355,7 +384,6 @@
       ordenesAbiertas.push(nuevaOT);
       localStorage.setItem('ordenesAbiertas', JSON.stringify(ordenesAbiertas));
 
-      // Incrementar secuencial
       contadorOT++;
       localStorage.setItem('contadorOT', contadorOT);
 
@@ -363,7 +391,7 @@
       mostrarTablero();
     });
 
-    // RENDERIZAR TABLERO DE ABIERTAS
+    // RENDERIZAR TABLERO
     function renderizarTablero() {
       const tbody = document.getElementById('tablaAbiertas');
       tbody.innerHTML = '';
@@ -388,7 +416,7 @@
       });
     }
 
-    // ABRIR MODAL PARA FINALIZAR
+    // ABRIR MODAL
     function abrirModalFinalizar(id) {
       otSeleccionadaId = id;
       const ot = ordenesAbiertas.find(item => item.id === id);
@@ -411,7 +439,6 @@
       const fechaFinObj = new Date();
       const fechaInicioObj = new Date(ot.fechaInicioISO);
 
-      // Calcular tiempo transcurrido
       const diffMs = fechaFinObj - fechaInicioObj;
       const diffMins = Math.floor(diffMs / 60000);
       const horas = Math.floor(diffMins / 60);
@@ -426,7 +453,6 @@
         estado: 'COMPLETADO'
       };
 
-      // ENVIAR A NETLIFY FORMS
       fetch('/', {
         method: 'POST',
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
@@ -436,7 +462,6 @@
         }).toString()
       })
       .then(() => {
-        // Eliminar de las abiertas
         ordenesAbiertas.splice(index, 1);
         localStorage.setItem('ordenesAbiertas', JSON.stringify(ordenesAbiertas));
         cerrarModal();
@@ -446,22 +471,6 @@
       .catch(error => alert("Error al guardar en Netlify: " + error));
     }
   </script>
-
-  <!-- FORMULARIO OCULTO TOTALMENTE INVISIBLE PARA NETLIFY -->
-  <form name="otFormNetlify" data-netlify="true" style="display: none !important;">
-    <input type="text" name="ordenTrabajo">
-    <input type="text" name="mecanico">
-    <input type="text" name="trabajoRealizar">
-    <input type="text" name="operacion">
-    <input type="text" name="maquinaTaller">
-    <input type="text" name="codMaq">
-    <input type="text" name="centroTrabajo">
-    <input type="text" name="maquinaSolicitante">
-    <input type="text" name="horaInicio">
-    <input type="text" name="horaFin">
-    <input type="text" name="totalTiempo">
-    <textarea name="observaciones"></textarea>
-  </form>
 
 </body>
 </html>
