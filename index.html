@@ -12,7 +12,6 @@
       --accent: #2563eb;
       --border: #cbd5e1;
       --text: #0f172a;
-      --success: #16a34a;
     }
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -32,11 +31,14 @@
       border: 1px solid var(--border);
       overflow: hidden;
     }
+    
+    /* ENCABEZADO Y BOTÓN ADMIN COMPACTO */
     .header {
       background: var(--primary);
       color: #fff;
-      padding: 20px;
+      padding: 24px 20px 20px 20px;
       text-align: center;
+      position: relative;
     }
     .header h1 {
       margin: 0;
@@ -49,6 +51,27 @@
       font-size: 0.85rem;
       color: #94a3b8;
     }
+    .btn-admin {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background-color: rgba(255, 255, 255, 0.15);
+      color: #ffffff;
+      padding: 5px 10px;
+      border-radius: 5px;
+      text-decoration: none;
+      font-size: 0.75rem;
+      font-weight: 600;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      transition: background 0.2s;
+      display: inline-block;
+      width: auto;
+    }
+    .btn-admin:hover {
+      background-color: rgba(255, 255, 255, 0.3);
+    }
+
+    /* FORMULARIO Y CAMPOS */
     form {
       padding: 24px;
       display: grid;
@@ -87,6 +110,8 @@
       resize: vertical;
       min-height: 80px;
     }
+    
+    /* TIEMPOS Y BOTONES AUTOMÁTICOS */
     .time-container {
       display: flex;
       gap: 8px;
@@ -107,6 +132,11 @@
     .btn-time:hover {
       background-color: #334155;
     }
+    .readonly-input {
+      background-color: #e2e8f0 !important;
+      font-weight: bold;
+    }
+    
     .btn-submit {
       grid-column: 1 / -1;
       background-color: var(--accent);
@@ -124,13 +154,14 @@
     .btn-submit:hover {
       background-color: #1d4ed8;
     }
-    .readonly-input {
-      background-color: #e2e8f0 !important;
-      font-weight: bold;
-    }
+
     @media (max-width: 600px) {
       form {
         grid-template-columns: 1fr;
+      }
+      .btn-admin {
+        position: static;
+        margin-bottom: 10px;
       }
     }
   </style>
@@ -139,19 +170,20 @@
 
   <div class="container">
     <div class="header">
-      <h1>Registro Órdenes de Trabajo</h1>
-      <p>Industrias Plasticas Josa</p>
+      <a href="admin.html" class="btn-admin">🔑 Admin</a>
+      <h1>Registro de Órdenes de Trabajo</h1>
+      <p>Gestión y Control de Piso de Taller</p>
     </div>
 
-    <form id="otForm">
+    <form id="otForm" data-netlify="true">
       
-      <!-- Orden de trabajo -->
+      <!-- Campo 1: Orden de Trabajo (Bloqueado) -->
       <div class="form-group">
         <label for="ordenTrabajo">Orden de Trabajo (OT)</label>
         <input type="text" id="ordenTrabajo" name="ordenTrabajo" value="OT/0001" readonly class="readonly-input">
       </div>
 
-      <!-- Mecánico -->
+      <!-- Campo 2: Mecánico -->
       <div class="form-group">
         <label for="mecanico">Mecánico Asignado</label>
         <select id="mecanico" name="mecanico" required>
@@ -168,7 +200,7 @@
         </select>
       </div>
 
-      <!-- Trabajo a realizar -->
+      <!-- Campo 3: Trabajo a Realizar -->
       <div class="form-group full-width">
         <label for="trabajoRealizar">Trabajo a Realizar</label>
         <select id="trabajoRealizar" name="trabajoRealizar" required>
@@ -185,7 +217,7 @@
         </select>
       </div>
 
-      <!-- Operación -->
+      <!-- Campo 4: Operación -->
       <div class="form-group">
         <label for="operacion">Operación</label>
         <select id="operacion" name="operacion" required>
@@ -205,7 +237,7 @@
         </select>
       </div>
 
-      <!-- Máquina del taller -->
+      <!-- Campo 5: Máquina del Taller -->
       <div class="form-group">
         <label for="maquinaTaller">Máquina Taller</label>
         <select id="maquinaTaller" name="maquinaTaller" required>
@@ -217,7 +249,7 @@
         </select>
       </div>
 
-      <!-- Código Máquina Taller -->
+      <!-- Campo 6: Código Máquina Taller -->
       <div class="form-group">
         <label for="codMaq">Cód. Máquina Taller (COD-MAQ)</label>
         <select id="codMaq" name="codMaq" required>
@@ -230,7 +262,7 @@
         </select>
       </div>
 
-      <!-- Centro de Trabajo -->
+      <!-- Campo 7: Centro de Trabajo -->
       <div class="form-group">
         <label for="centroTrabajo">Centro de Trabajo</label>
         <select id="centroTrabajo" name="centroTrabajo" required>
@@ -242,7 +274,7 @@
         </select>
       </div>
 
-      <!-- Máquina Solicitante -->
+      <!-- Campo 8: Máquina Solicitante / Planta -->
       <div class="form-group full-width">
         <label for="maquinaSolicitante">Máquina Solicitante / Planta</label>
         <select id="maquinaSolicitante" name="maquinaSolicitante" required>
@@ -256,7 +288,7 @@
         </select>
       </div>
 
-      <!-- HORA INICIO AUTOMÁTICA -->
+      <!-- Campo 9: Hora Inicio Automática -->
       <div class="form-group">
         <label for="horaInicio">Hora Inicio Trabajo</label>
         <div class="time-container">
@@ -265,7 +297,7 @@
         </div>
       </div>
 
-      <!-- HORA FIN AUTOMÁTICA -->
+      <!-- Campo 10: Hora Fin Automática -->
       <div class="form-group">
         <label for="horaFin">Hora Fin Trabajo</label>
         <div class="time-container">
@@ -274,13 +306,13 @@
         </div>
       </div>
 
-      <!-- TOTAL DE TIEMPO CALCULADO -->
+      <!-- Campo 11: Total Tiempo Calculado -->
       <div class="form-group full-width">
         <label for="totalTiempo">Total Tiempo Transcurrido</label>
         <input type="text" id="totalTiempo" name="totalTiempo" placeholder="Calculado automáticamente..." readonly class="readonly-input">
       </div>
 
-      <!-- CAMPO OBSERVACIONES LIBRE -->
+      <!-- Campo 12: Observaciones -->
       <div class="form-group full-width">
         <label for="observaciones">Observaciones / Novedades</label>
         <textarea id="observaciones" name="observaciones" placeholder="Escriba aquí detalles adicionales del trabajo realizado..."></textarea>
@@ -291,7 +323,7 @@
     </form>
   </div>
 
-  <!-- SCRIPT DE TIEMPOS AUTOMÁTICOS -->
+  <!-- CÓDIGO JAVASCRIPTS PARA HORAS Y CÁLCULOS -->
   <script>
     let fechaInicioObj = null;
     let fechaFinObj = null;
