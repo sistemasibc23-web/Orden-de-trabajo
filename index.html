@@ -13,8 +13,6 @@
       --border: #cbd5e1;
       --text: #1e293b;
       --success: #16a34a;
-      --warning: #d97706;
-      --danger: #dc2626;
     }
 
     body {
@@ -57,14 +55,11 @@
       text-decoration: none;
       font-size: 0.85rem;
       font-weight: bold;
-      transition: background 0.2s;
     }
-    .btn-admin:hover { background-color: #1d4ed8; }
 
-    /* LAYOUT PRINCIPAL */
     .main-grid {
       display: grid;
-      grid-template-columns: 320px 1fr;
+      grid-template-columns: 360px 1fr;
       gap: 20px;
     }
 
@@ -88,7 +83,6 @@
       color: var(--primary);
     }
 
-    /* FORMULARIO DE REGISTRO */
     .form-group {
       margin-bottom: 12px;
       display: flex;
@@ -107,14 +101,10 @@
       padding: 8px 10px;
       border: 1px solid var(--border);
       border-radius: 6px;
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       width: 100%;
       box-sizing: border-box;
-    }
-
-    input:focus, select:focus, textarea:focus {
-      outline: 2px solid var(--accent);
-      border-color: transparent;
+      background-color: #fff;
     }
 
     .btn-submit {
@@ -130,7 +120,6 @@
       font-size: 0.9rem;
     }
 
-    /* KANBAN / LISTA DE TRABAJOS ACTIVOS */
     .grid-tablero {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -165,27 +154,18 @@
       margin-bottom: 12px;
     }
 
-    .ot-footer {
-      display: flex;
-      gap: 8px;
-      margin-top: auto;
-    }
-
-    .btn-action {
-      flex: 1;
+    .btn-finish {
+      background-color: #dcfce7;
+      color: #15803d;
+      border: 1px solid #86efac;
       padding: 6px;
       border-radius: 4px;
-      border: none;
       font-size: 0.75rem;
       font-weight: bold;
       cursor: pointer;
-      text-align: center;
+      width: 100%;
     }
 
-    .btn-finish { background-color: #dcfce7; color: #15803d; border: 1px solid #86efac; }
-    .btn-finish:hover { background-color: #bbf7d0; }
-
-    /* MODAL DE FINALIZACIÓN */
     .modal {
       display: none;
       position: fixed;
@@ -207,7 +187,7 @@
 </head>
 <body>
 
-  <!-- FORMULARIO OCULTO PARA QUE NETLIFY DETECTE LA ESTRUCTURA -->
+  <!-- FORMULARIO OCULTO PARA RESPALDO DE NETLIFY -->
   <form name="otFormNetlify" netlify netlify-honeypot="bot-field" hidden>
     <input type="text" name="ordenTrabajo" />
     <input type="text" name="mecanico" />
@@ -227,24 +207,25 @@
 
   <div class="container">
     <div class="header">
-      <h1>🛠️ Taller — Registro y Control de Órdenes</h1>
+      <h1>🛠️ Taller — Registro de Órdenes de Trabajo</h1>
       <a href="admin.html" class="btn-admin">🔐 Panel Admin / Reportes</a>
     </div>
 
     <div class="main-grid">
       <!-- FORMULARIO NUEVA OT -->
       <div class="card">
-        <h2>Ingresar Nueva OT</h2>
+        <h2>Ingresar OT</h2>
         <form id="formNuevaOT" onsubmit="registrarOT(event)">
+          
           <div class="form-group">
             <label for="ordenTrabajo">N° Orden de Trabajo (OT)</label>
-            <input type="text" id="ordenTrabajo" placeholder="Ej: OT-1045" required>
+            <input type="text" id="ordenTrabajo" placeholder="Ej: OT-1001" required>
           </div>
 
           <div class="form-group">
-            <label for="mecanico">Mecánico Asignado</label>
+            <label for="mecanico">Mecánico</label>
             <select id="mecanico" required>
-              <option value="">-- Seleccionar --</option>
+              <option value="">-- Seleccionar Mecánico --</option>
               <option value="HECTOR VIEJO">HECTOR VIEJO</option>
               <option value="ANTHONY ZAMBRANO">ANTHONY ZAMBRANO</option>
               <option value="XAVIER LEON">XAVIER LEON</option>
@@ -257,32 +238,81 @@
 
           <div class="form-group">
             <label for="trabajoRealizar">Trabajo a Realizar</label>
-            <input type="text" id="trabajoRealizar" placeholder="Ej: Mantenimiento Preventivo" required>
+            <select id="trabajoRealizar" required>
+              <option value="">-- Seleccionar Trabajo --</option>
+              <option value="FABRICAR">FABRICAR</option>
+              <option value="REPARAR">REPARAR</option>
+              <option value="MODIFICAR">MODIFICAR</option>
+              <option value="MANTENIMIENTO PREVENTIVO">MANTENIMIENTO PREVENTIVO</option>
+              <option value="MANTENIMIENTO CORRECTIVO">MANTENIMIENTO CORRECTIVO</option>
+              <option value="INSTALACION">INSTALACION</option>
+              <option value="AJUSTE Y CALIBRACION">AJUSTE Y CALIBRACION</option>
+            </select>
           </div>
 
           <div class="form-group">
             <label for="operacion">Operación</label>
-            <input type="text" id="operacion" placeholder="Ej: Cambio de rodamientos">
+            <select id="operacion" required>
+              <option value="">-- Seleccionar Operación --</option>
+              <option value="TORNEADO">TORNEADO</option>
+              <option value="FRESADO">FRESADO</option>
+              <option value="SOLDADURA">SOLDADURA</option>
+              <option value="CORTE Y TRAZO">CORTE Y TRAZO</option>
+              <option value="ENSAMBLE">ENSAMBLE</option>
+              <option value="DESMONTAJE">DESMONTAJE</option>
+              <option value="RECTIFICADO">RECTIFICADO</option>
+              <option value="TALADRADO">TALADRADO</option>
+              <option value="LIMPIEZA Y PINTURA">LIMPIEZA Y PINTURA</option>
+            </select>
           </div>
 
           <div class="form-group">
             <label for="maquinaTaller">Máquina Taller</label>
-            <input type="text" id="maquinaTaller" placeholder="Ej: Torno #1">
+            <select id="maquinaTaller" required>
+              <option value="">-- Seleccionar Máquina --</option>
+              <option value="TORNO PARALELO">TORNO PARALELO</option>
+              <option value="FRESADORA UNIVERSAL">FRESADORA UNIVERSAL</option>
+              <option value="TALADRO DE ARBOL">TALADRO DE ARBOL</option>
+              <option value="SOLDADORA SMAW/MIG">SOLDADORA SMAW/MIG</option>
+              <option value="SIERRA DE CINTA">SIERRA DE CINTA</option>
+              <option value="AMOLADORA/ESMERIL">AMOLADORA/ESMERIL</option>
+              <option value="PRENSA HIDRAULICA">PRENSA HIDRAULICA</option>
+              <option value="HERRAMIENTAS MANUALES">HERRAMIENTAS MANUALES</option>
+            </select>
           </div>
 
           <div class="form-group">
             <label for="codMaq">Código Máquina</label>
-            <input type="text" id="codMaq" placeholder="Ej: MAQ-023">
+            <input type="text" id="codMaq" placeholder="Ej: C-01" required>
           </div>
 
           <div class="form-group">
             <label for="centroTrabajo">Centro de Trabajo</label>
-            <input type="text" id="centroTrabajo" placeholder="Ej: Mecánica General">
+            <select id="centroTrabajo" required>
+              <option value="">-- Seleccionar Centro --</option>
+              <option value="MECANIZADO">MECANIZADO</option>
+              <option value="SOLDADURA Y PAILERIA">SOLDADURA Y PAILERIA</option>
+              <option value="MANTENIMIENTO MECANICO">MANTENIMIENTO MECANICO</option>
+              <option value="MANTENIMIENTO ELECTRICO">MANTENIMIENTO ELECTRICO</option>
+              <option value="UTILLAJE Y MATRICERIA">UTILLAJE Y MATRICERIA</option>
+            </select>
           </div>
 
           <div class="form-group">
             <label for="maquinaSolicitante">Máquina Solicitante</label>
-            <input type="text" id="maquinaSolicitante" placeholder="Ej: Extrusora Principal">
+            <select id="maquinaSolicitante" required>
+              <option value="">-- Seleccionar Solicitante --</option>
+              <option value="EXTRUSORA 01">EXTRUSORA 01</option>
+              <option value="EXTRUSORA 02">EXTRUSORA 02</option>
+              <option value="IMPRESORA FLEXOGRAFICA">IMPRESORA FLEXOGRAFICA</option>
+              <option value="SELLADORA 01">SELLADORA 01</option>
+              <option value="SELLADORA 02">SELLADORA 02</option>
+              <option value="MEZCLADORA">MEZCLADORA</option>
+              <option value="PELETIZADORA">PELETIZADORA</option>
+              <option value="COMPRESOR PRINCIPAL">COMPRESOR PRINCIPAL</option>
+              <option value="TORRE DE ENFRIAMIENTO">TORRE DE ENFRIAMIENTO</option>
+              <option value="SERVICIOS GENERALES">SERVICIOS GENERALES</option>
+            </select>
           </div>
 
           <button type="submit" class="btn-submit">▶️ Iniciar Trabajo</button>
@@ -291,9 +321,9 @@
 
       <!-- TRABAJOS EN CURSO -->
       <div class="card">
-        <h2>Órdenes en Proceso</h2>
+        <h2>Órdenes Activas en Taller</h2>
         <div id="tableroEnProceso" class="grid-tablero">
-          <!-- Tarjetas generadas dinámicamente -->
+          <!-- Se puebla dinámicamente -->
         </div>
       </div>
     </div>
@@ -306,7 +336,7 @@
       <p id="modalDetalleOT" style="font-size: 0.85rem; color: #64748b;"></p>
       <div class="form-group">
         <label for="modalObservaciones">Observaciones / Novedades</label>
-        <textarea id="modalObservaciones" rows="3" placeholder="Ingrese detalles o repuestos utilizados..."></textarea>
+        <textarea id="modalObservaciones" rows="3" placeholder="Ingresa repuestos usados o detalles adicionales..."></textarea>
       </div>
       <div style="display: flex; gap: 10px; margin-top: 15px;">
         <button class="btn-submit" style="background-color: var(--success);" onclick="confirmarFinalizacion()">✔ Confirmar y Cerrar</button>
@@ -332,12 +362,12 @@
         id: Date.now(),
         ordenTrabajo: document.getElementById('ordenTrabajo').value.trim(),
         mecanico: document.getElementById('mecanico').value,
-        trabajoRealizar: document.getElementById('trabajoRealizar').value.trim(),
-        operacion: document.getElementById('operacion').value.trim(),
-        maquinaTaller: document.getElementById('maquinaTaller').value.trim(),
+        trabajoRealizar: document.getElementById('trabajoRealizar').value,
+        operacion: document.getElementById('operacion').value,
+        maquinaTaller: document.getElementById('maquinaTaller').value,
         codMaq: document.getElementById('codMaq').value.trim(),
-        centroTrabajo: document.getElementById('centroTrabajo').value.trim(),
-        maquinaSolicitante: document.getElementById('maquinaSolicitante').value.trim(),
+        centroTrabajo: document.getElementById('centroTrabajo').value,
+        maquinaSolicitante: document.getElementById('maquinaSolicitante').value,
         fechaInicioISO: ahora.toISOString(),
         fechaInicio: ahora.toISOString().split('T')[0],
         horaInicio: ahora.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })
@@ -369,13 +399,11 @@
             </div>
             <div class="ot-body">
               <strong>Mecánico:</strong> ${ot.mecanico}<br>
-              <strong>Trabajo:</strong> ${ot.trabajoRealizar}<br>
+              <strong>Trabajo:</strong> ${ot.trabajoRealizar} (${ot.operacion})<br>
               <strong>Solicitante:</strong> ${ot.maquinaSolicitante}
             </div>
           </div>
-          <div class="ot-footer">
-            <button class="btn-action btn-finish" onclick="abrirModalFinalizar(${ot.id})">✔ Finalizar OT</button>
-          </div>
+          <button class="btn-finish" onclick="abrirModalFinalizar(${ot.id})">✔ Finalizar OT</button>
         `;
         contenedor.appendChild(card);
       });
@@ -404,12 +432,11 @@
       const fechaFinObj = new Date();
       const fechaInicioObj = new Date(ot.fechaInicioISO);
 
-      // Cálculo diferencial de tiempo
       const diffMs = fechaFinObj - fechaInicioObj;
       const diffMins = Math.floor(diffMs / 60000);
       const horas = Math.floor(diffMins / 60);
       const minutos = diffMins % 60;
-      let totalTiempo = (horas > 0 ? `${horas} hora(s) ` : "") + `${minutos} min`;
+      let totalTiempo = (horas > 0 ? `${horas} h ` : "") + `${minutos} min`;
 
       const datosFinales = {
         ...ot,
@@ -420,12 +447,12 @@
         estado: 'COMPLETADO'
       };
 
-      // 1. REGISTRO EN EL HISTORIAL PERSISTENTE PARA ADMIN
+      // Guardar en almacenamiento para el Admin
       let historial = JSON.parse(localStorage.getItem('historialOrdenesCompletadas')) || [];
       historial.push(datosFinales);
       localStorage.setItem('historialOrdenesCompletadas', JSON.stringify(historial));
 
-      // 2. ENVIAR A RESPALDO EN NETLIFY FORMS
+      // Respaldo silencioso en Netlify Forms
       fetch('/', {
         method: 'POST',
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
@@ -435,13 +462,12 @@
         }).toString()
       }).catch(error => console.log("Respaldo Netlify:", error));
 
-      // 3. LIMPIAR DE ABIERTAS
       ordenesAbiertas.splice(index, 1);
       localStorage.setItem('ordenesAbiertas', JSON.stringify(ordenesAbiertas));
 
       cerrarModal();
       renderizarTablero();
-      alert(`¡Orden ${ot.ordenTrabajo} completada! Tiempo total invertido: ${totalTiempo}`);
+      alert(`¡Orden ${ot.ordenTrabajo} finalizada! Tiempo registrado: ${totalTiempo}`);
     }
   </script>
 </body>
