@@ -12,6 +12,9 @@
       --accent: #2563eb;
       --border: #cbd5e1;
       --text: #0f172a;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
     }
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -24,62 +27,171 @@
     }
     .container {
       width: 100%;
-      max-width: 850px;
+      max-width: 1000px;
       background: var(--card);
       border-radius: 10px;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
       border: 1px solid var(--border);
       overflow: hidden;
     }
+    
+    /* ENCABEZADO Y CONTROLES */
     .header {
       background: var(--primary);
       color: #fff;
-      padding: 24px 20px 20px 20px;
-      text-align: center;
-      position: relative;
+      padding: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
     }
     .header h1 {
       margin: 0;
-      font-size: 1.4rem;
+      font-size: 1.3rem;
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }
     .header p {
-      margin: 5px 0 0 0;
-      font-size: 0.85rem;
+      margin: 4px 0 0 0;
+      font-size: 0.8rem;
       color: #94a3b8;
     }
-    .btn-admin {
-      position: absolute;
-      top: 12px;
-      right: 12px;
-      background-color: rgba(255, 255, 255, 0.15);
-      color: #ffffff;
-      padding: 5px 10px;
-      border-radius: 5px;
+    .header-btns {
+      display: flex;
+      gap: 10px;
+    }
+    .btn-action {
+      background-color: var(--accent);
+      color: white;
+      border: none;
+      padding: 9px 16px;
+      border-radius: 6px;
+      font-weight: 700;
+      font-size: 0.85rem;
+      cursor: pointer;
       text-decoration: none;
-      font-size: 0.75rem;
-      font-weight: 600;
-      border: 1px solid rgba(255, 255, 255, 0.3);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
       transition: background 0.2s;
-      display: inline-block;
-      width: auto;
     }
-    .btn-admin:hover {
-      background-color: rgba(255, 255, 255, 0.3);
+    .btn-action:hover { background-color: #1d4ed8; }
+    .btn-admin {
+      background-color: rgba(255, 255, 255, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.3);
     }
-    form {
+    .btn-admin:hover { background-color: rgba(255, 255, 255, 0.3); }
+
+    /* SECCIÓN PRINCIPAL: ÓRDENES ABIERTAS */
+    .main-content {
       padding: 24px;
+    }
+    .section-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid var(--border);
+    }
+    .section-title h2 {
+      margin: 0;
+      font-size: 1.1rem;
+      color: var(--primary);
+      text-transform: uppercase;
+    }
+
+    /* TABLA DE ÓRDENES EN PROCESO */
+    .table-responsive {
+      overflow-x: auto;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+    th, td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+    th {
+      background-color: #f1f5f9;
+      color: #334155;
+      font-weight: 700;
+      text-transform: uppercase;
+      font-size: 0.75rem;
+    }
+    tr:hover { background-color: #f8fafc; }
+
+    .badge-open {
+      background-color: #fef3c7;
+      color: #b45309;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: bold;
+    }
+    .btn-close-ot {
+      background-color: var(--success);
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .btn-close-ot:hover { background-color: #059669; }
+
+    /* MODAL DE NUEVA ORDEN DE TRABAJO */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(3px);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      padding: 15px;
+    }
+    .modal-card {
+      background: white;
+      border-radius: 10px;
+      max-width: 800px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    }
+    .modal-header {
+      background: var(--primary);
+      color: white;
+      padding: 16px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .modal-header h3 { margin: 0; font-size: 1.1rem; text-transform: uppercase; }
+    .close-modal {
+      background: transparent;
+      border: none;
+      color: white;
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+
+    /* FORMULARIO ESTILOS ORIGINALES */
+    form {
+      padding: 20px;
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 16px;
     }
     .full-width { grid-column: 1 / -1; }
-    .form-group {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
     label {
       font-weight: 600;
       font-size: 0.85rem;
@@ -94,36 +206,11 @@
       background-color: #f8fafc;
       color: var(--text);
       outline: none;
-      transition: border-color 0.2s;
     }
-    input:focus, select:focus, textarea:focus {
-      border-color: var(--accent);
-      background-color: #fff;
-    }
-    textarea {
-      resize: vertical;
-      min-height: 80px;
-    }
-    .time-container {
-      display: flex;
-      gap: 8px;
-    }
-    .time-container input { flex: 1; }
-    .btn-time {
-      background-color: #475569;
-      color: white;
-      border: none;
-      padding: 0 12px;
-      border-radius: 6px;
-      font-size: 0.8rem;
-      cursor: pointer;
-      font-weight: 600;
-    }
-    .btn-time:hover { background-color: #334155; }
-    .readonly-input {
-      background-color: #e2e8f0 !important;
-      font-weight: bold;
-    }
+    input:focus, select:focus, textarea:focus { border-color: var(--accent); background-color: #fff; }
+    textarea { resize: vertical; min-height: 70px; }
+    
+    .readonly-input { background-color: #e2e8f0 !important; font-weight: bold; }
     .btn-submit {
       grid-column: 1 / -1;
       background-color: var(--accent);
@@ -135,176 +222,203 @@
       font-size: 1rem;
       cursor: pointer;
       text-transform: uppercase;
-      transition: background 0.2s;
-      margin-top: 10px;
+      margin-top: 5px;
     }
     .btn-submit:hover { background-color: #1d4ed8; }
 
     @media (max-width: 600px) {
       form { grid-template-columns: 1fr; }
-      .btn-admin { position: static; margin-bottom: 10px; }
     }
   </style>
 </head>
 <body>
 
   <div class="container">
+    <!-- CABECERA PRINCIPAL -->
     <div class="header">
-      <a href="admin.html" class="btn-admin">🔑 Admin</a>
-      <h1>Registro de Órdenes de Trabajo</h1>
-      <p>Gestión y Control de Piso de Taller</p>
+      <div>
+        <h1>Control de Piso de Taller</h1>
+        <p>Gestión de Órdenes Abiertas y Trabajo en Curso</p>
+      </div>
+      <div class="header-btns">
+        <button class="btn-action" onclick="abrirModalNuevaOT()">➕ Nueva Orden</button>
+        <a href="admin.html" class="btn-action btn-admin">🔑 Admin / Historial</a>
+      </div>
     </div>
 
-    <form id="otForm" onsubmit="guardarRegistro(event)">
-      
-      <!-- OT Secuencial Bloqueada -->
-      <div class="form-group">
-        <label for="ordenTrabajo">Orden de Trabajo (OT)</label>
-        <input type="text" id="ordenTrabajo" name="ordenTrabajo" value="OT/0001" readonly class="readonly-input">
+    <!-- PANTALLA PRINCIPAL: TABLA DE ÓRDENES ABIERTAS -->
+    <div class="main-content">
+      <div class="section-title">
+        <h2>🟡 Órdenes de Trabajo Activas / Abiertas</h2>
       </div>
 
-      <!-- Mecánico -->
-      <div class="form-group">
-        <label for="mecanico">Mecánico Asignado</label>
-        <select id="mecanico" name="mecanico" required>
-          <option value="">— Seleccionar Mecánico —</option>
-          <option value="HECTOR VIEJO">HECTOR VIEJO</option>
-          <option value="ANTHONY ZAMBRANO">ANTHONY ZAMBRANO</option>
-          <option value="XAVIER LEON">XAVIER LEON</option>
-          <option value="FERNANDO PIGUAVE">FERNANDO PIGUAVE</option>
-          <option value="ANDRES MORALES">ANDRES MORALES</option>
-          <option value="CRISTOPHER RUSSO">CRISTOPHER RUSSO</option>
-          <option value="BOLIVAR GOYON">BOLIVAR GOYON</option>
-          <option value="MECANICO 1">MECANICO 1</option>
-          <option value="MECANICO 2">MECANICO 2</option>
-        </select>
+      <div class="table-responsive">
+        <table>
+          <thead>
+            <tr>
+              <th>OT</th>
+              <th>Mecánico</th>
+              <th>Trabajo / Operación</th>
+              <th>Ubicación / Máquina</th>
+              <th>Hora Inicio</th>
+              <th>Estado</th>
+              <th>Acción</th>
+            </tr>
+          </thead>
+          <tbody id="tablaOrdenesAbiertas">
+            <!-- Se carga dinámicamente -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- VENTANA MODAL PARA REGISTRAR NUEVA ORDEN -->
+  <div class="modal-overlay" id="modalOT">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>Apertura de Orden de Trabajo</h3>
+        <button class="close-modal" onclick="cerrarModalNuevaOT()">&times;</button>
       </div>
 
-      <!-- Trabajo a Realizar -->
-      <div class="form-group full-width">
-        <label for="trabajoRealizar">Trabajo a Realizar</label>
-        <select id="trabajoRealizar" name="trabajoRealizar" required>
-          <option value="">— Seleccionar Trabajo —</option>
-          <option value="REPARAR">1. REPARAR</option>
-          <option value="LIMPIAR BOQUILLA">2. LIMPIAR BOQUILLA</option>
-          <option value="PERFORAR">3. PERFORAR</option>
-          <option value="ALISTAR MOLDE">4. ALISTAR MOLDE</option>
-          <option value="LIMPIEZA TALLER">5. LIMPIEZA TALLER</option>
-          <option value="FABRICAR">6. FABRICAR</option>
-          <option value="PULIR">7. PULIR</option>
-          <option value="REVISAR">8. REVISAR</option>
-          <option value="SOPORTE GENERAL">9. SOPORTE GENERAL</option>
-        </select>
-      </div>
-
-      <!-- Operación -->
-      <div class="form-group">
-        <label for="operacion">Operación</label>
-        <select id="operacion" name="operacion" required>
-          <option value="">— Seleccionar Operación —</option>
-          <option value="AJUSTE MECANICO">1. AJUSTE MECANICO</option>
-          <option value="AUTOGENA">2. AUTOGENA</option>
-          <option value="CNC">3. CNC</option>
-          <option value="DIBUJO TECNICO">4. DIBUJO TECNICO</option>
-          <option value="ELECTROEROCION">5. ELECTROEROCIÓN</option>
-          <option value="FRESADO">6. FRESADO</option>
-          <option value="LIMPIEZA">7. LIMPIEZA</option>
-          <option value="PULIDO">8. PULIDO</option>
-          <option value="ROSCADO">9. ROSCADO</option>
-          <option value="SOLDADURA">10. SOLDADURA</option>
-          <option value="TORNEADO">11. TORNEADO</option>
-          <option value="MT. ELECTRICO">12. MT. ELECTRICO</option>
-        </select>
-      </div>
-
-      <!-- Máquina Taller -->
-      <div class="form-group">
-        <label for="maquinaTaller">Máquina Taller</label>
-        <select id="maquinaTaller" name="maquinaTaller" required>
-          <option value="">— Seleccionar Máquina Taller —</option>
-          <option value="CNC">1. CNC</option>
-          <option value="DIBUJO 1">2. DIBUJO 1</option>
-          <option value="DIBUJO 2">3. DIBUJO 2</option>
-          <option value="EROCIONADORA 1">4. EROCIONADORA 1</option>
-        </select>
-      </div>
-
-      <!-- COD-MAQ -->
-      <div class="form-group">
-        <label for="codMaq">Cód. Máquina Taller (COD-MAQ)</label>
-        <select id="codMaq" name="codMaq" required>
-          <option value="">— Seleccionar COD-MAQ —</option>
-          <option value="CNC #1">CNC #1</option>
-          <option value="DB #1">DB #1</option>
-          <option value="ERO #1">ERO #1</option>
-          <option value="FRE #1">FRE #1</option>
-          <option value="REC #1">REC #1</option>
-        </select>
-      </div>
-
-      <!-- Centro Trabajo -->
-      <div class="form-group">
-        <label for="centroTrabajo">Centro de Trabajo</label>
-        <select id="centroTrabajo" name="centroTrabajo" required>
-          <option value="">— Seleccionar Centro —</option>
-          <option value="MC01">MC01</option>
-          <option value="MC02">MC02</option>
-          <option value="MC03">MC03</option>
-          <option value="D.T">D.T</option>
-        </select>
-      </div>
-
-      <!-- Máquina Solicitante -->
-      <div class="form-group full-width">
-        <label for="maquinaSolicitante">Máquina Solicitante / Planta</label>
-        <select id="maquinaSolicitante" name="maquinaSolicitante" required>
-          <option value="">— Seleccionar Máquina Planta —</option>
-          <optgroup label="Inyección">
-            <option value="INY-102">INY-102</option>
-          </optgroup>
-          <optgroup label="Soplado">
-            <option value="SOP-F">SOP-F</option>
-          </optgroup>
-        </select>
-      </div>
-
-      <!-- Horas y Tiempos -->
-      <div class="form-group">
-        <label for="horaInicio">Hora Inicio Trabajo</label>
-        <div class="time-container">
-          <input type="text" id="horaInicio" name="horaInicio" placeholder="--:--" readonly class="readonly-input">
-          <button type="button" class="btn-time" onclick="marcarInicio()">Iniciar</button>
+      <form id="otForm" onsubmit="crearNuevaOrden(event)">
+        <!-- OT Secuencial Bloqueada -->
+        <div class="form-group">
+          <label for="ordenTrabajo">Orden de Trabajo (OT)</label>
+          <input type="text" id="ordenTrabajo" name="ordenTrabajo" value="OT/0001" readonly class="readonly-input">
         </div>
-      </div>
 
-      <div class="form-group">
-        <label for="horaFin">Hora Fin Trabajo</label>
-        <div class="time-container">
-          <input type="text" id="horaFin" name="horaFin" placeholder="--:--" readonly class="readonly-input">
-          <button type="button" class="btn-time" onclick="marcarFin()">Finalizar</button>
+        <!-- Mecánico -->
+        <div class="form-group">
+          <label for="mecanico">Mecánico Asignado</label>
+          <select id="mecanico" name="mecanico" required>
+            <option value="">— Seleccionar Mecánico —</option>
+            <option value="HECTOR VIEJO">HECTOR VIEJO</option>
+            <option value="ANTHONY ZAMBRANO">ANTHONY ZAMBRANO</option>
+            <option value="XAVIER LEON">XAVIER LEON</option>
+            <option value="FERNANDO PIGUAVE">FERNANDO PIGUAVE</option>
+            <option value="ANDRES MORALES">ANDRES MORALES</option>
+            <option value="CRISTOPHER RUSSO">CRISTOPHER RUSSO</option>
+            <option value="BOLIVAR GOYON">BOLIVAR GOYON</option>
+            <option value="MECANICO 1">MECANICO 1</option>
+            <option value="MECANICO 2">MECANICO 2</option>
+          </select>
         </div>
-      </div>
 
-      <div class="form-group full-width">
-        <label for="totalTiempo">Total Tiempo Transcurrido</label>
-        <input type="text" id="totalTiempo" name="totalTiempo" placeholder="Calculado automáticamente..." readonly class="readonly-input">
-      </div>
+        <!-- Trabajo a Realizar -->
+        <div class="form-group full-width">
+          <label for="trabajoRealizar">Trabajo a Realizar</label>
+          <select id="trabajoRealizar" name="trabajoRealizar" required>
+            <option value="">— Seleccionar Trabajo —</option>
+            <option value="REPARAR">1. REPARAR</option>
+            <option value="LIMPIAR BOQUILLA">2. LIMPIAR BOQUILLA</option>
+            <option value="PERFORAR">3. PERFORAR</option>
+            <option value="ALISTAR MOLDE">4. ALISTAR MOLDE</option>
+            <option value="LIMPIEZA TALLER">5. LIMPIEZA TALLER</option>
+            <option value="FABRICAR">6. FABRICAR</option>
+            <option value="PULIR">7. PULIR</option>
+            <option value="REVISAR">8. REVISAR</option>
+            <option value="SOPORTE GENERAL">9. SOPORTE GENERAL</option>
+          </select>
+        </div>
 
-      <div class="form-group full-width">
-        <label for="observaciones">Observaciones / Novedades</label>
-        <textarea id="observaciones" name="observaciones" placeholder="Escriba aquí detalles adicionales..."></textarea>
-      </div>
+        <!-- Operación -->
+        <div class="form-group">
+          <label for="operacion">Operación</label>
+          <select id="operacion" name="operacion" required>
+            <option value="">— Seleccionar Operación —</option>
+            <option value="AJUSTE MECANICO">1. AJUSTE MECANICO</option>
+            <option value="AUTOGENA">2. AUTOGENA</option>
+            <option value="CNC">3. CNC</option>
+            <option value="DIBUJO TECNICO">4. DIBUJO TECNICO</option>
+            <option value="ELECTROEROCION">5. ELECTROEROCIÓN</option>
+            <option value="FRESADO">6. FRESADO</option>
+            <option value="LIMPIEZA">7. LIMPIEZA</option>
+            <option value="PULIDO">8. PULIDO</option>
+            <option value="ROSCADO">9. ROSCADO</option>
+            <option value="SOLDADURA">10. SOLDADURA</option>
+            <option value="TORNEADO">11. TORNEADO</option>
+            <option value="MT. ELECTRICO">12. MT. ELECTRICO</option>
+          </select>
+        </div>
 
-      <button type="submit" class="btn-submit">Registrar Orden de Trabajo</button>
+        <!-- Máquina Taller -->
+        <div class="form-group">
+          <label for="maquinaTaller">Máquina Taller</label>
+          <select id="maquinaTaller" name="maquinaTaller" required>
+            <option value="">— Seleccionar Máquina Taller —</option>
+            <option value="CNC">1. CNC</option>
+            <option value="DIBUJO 1">2. DIBUJO 1</option>
+            <option value="DIBUJO 2">3. DIBUJO 2</option>
+            <option value="EROCIONADORA 1">4. EROCIONADORA 1</option>
+          </select>
+        </div>
 
-    </form>
+        <!-- COD-MAQ -->
+        <div class="form-group">
+          <label for="codMaq">Cód. Máquina Taller (COD-MAQ)</label>
+          <select id="codMaq" name="codMaq" required>
+            <option value="">— Seleccionar COD-MAQ —</option>
+            <option value="CNC #1">CNC #1</option>
+            <option value="DB #1">DB #1</option>
+            <option value="ERO #1">ERO #1</option>
+            <option value="FRE #1">FRE #1</option>
+            <option value="REC #1">REC #1</option>
+          </select>
+        </div>
+
+        <!-- Centro Trabajo -->
+        <div class="form-group">
+          <label for="centroTrabajo">Centro de Trabajo</label>
+          <select id="centroTrabajo" name="centroTrabajo" required>
+            <option value="">— Seleccionar Centro —</option>
+            <option value="MC01">MC01</option>
+            <option value="MC02">MC02</option>
+            <option value="MC03">MC03</option>
+            <option value="D.T">D.T</option>
+          </select>
+        </div>
+
+        <!-- Máquina Solicitante -->
+        <div class="form-group full-width">
+          <label for="maquinaSolicitante">Máquina Solicitante / Planta</label>
+          <select id="maquinaSolicitante" name="maquinaSolicitante" required>
+            <option value="">— Seleccionar Máquina Planta —</option>
+            <optgroup label="Inyección">
+              <option value="INY-102">INY-102</option>
+            </optgroup>
+            <optgroup label="Soplado">
+              <option value="SOP-F">SOP-F</option>
+            </optgroup>
+          </select>
+        </div>
+
+        <!-- Observaciones -->
+        <div class="form-group full-width">
+          <label for="observaciones">Observaciones / Novedades</label>
+          <textarea id="observaciones" name="observaciones" placeholder="Escriba aquí notas de inicio..."></textarea>
+        </div>
+
+        <button type="submit" class="btn-submit">Iniciar e Ingresar Orden</button>
+      </form>
+    </div>
   </div>
 
   <script>
-    let fechaInicioObj = null;
-    let fechaFinObj = null;
+    document.addEventListener('DOMContentLoaded', () => {
+      cargarOrdenesAbiertas();
+    });
 
-    window.addEventListener('DOMContentLoaded', cargarSiguienteOT);
+    // 1. MANEJO DE VISTA MODAL Y SECUENCIA OT
+    function abrirModalNuevaOT() {
+      cargarSiguienteOT();
+      document.getElementById('modalOT').style.display = 'flex';
+    }
+
+    function cerrarModalNuevaOT() {
+      document.getElementById('modalOT').style.display = 'none';
+      document.getElementById('otForm').reset();
+    }
 
     function cargarSiguienteOT() {
       let numSecuencia = parseInt(localStorage.getItem('secuenciaOT')) || 1;
@@ -312,53 +426,16 @@
       document.getElementById('ordenTrabajo').value = codigoOT;
     }
 
-    function obtenerHoraActualTexto(date) {
-      return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-    }
-
-    function marcarInicio() {
-      fechaInicioObj = new Date();
-      document.getElementById('horaInicio').value = obtenerHoraActualTexto(fechaInicioObj);
-      calcularDiferencia();
-    }
-
-    function marcarFin() {
-      if (!fechaInicioObj) {
-        alert("Por favor marque primero la Hora de Inicio.");
-        return;
-      }
-      fechaFinObj = new Date();
-      document.getElementById('horaFin').value = obtenerHoraActualTexto(fechaFinObj);
-      calcularDiferencia();
-    }
-
-    function calcularDiferencia() {
-      if (fechaInicioObj && fechaFinObj) {
-        let diffMs = fechaFinObj - fechaInicioObj;
-        if (diffMs < 0) {
-          document.getElementById('totalTiempo').value = "Error en horas";
-          return;
-        }
-        let diffMins = Math.floor(diffMs / 60000);
-        let horas = Math.floor(diffMins / 60);
-        let minutos = diffMins % 60;
-        let res = "";
-        if (horas > 0) res += `${horas}h `;
-        res += `${minutos} min`;
-        document.getElementById('totalTiempo').value = res;
-      }
-    }
-
-    function guardarRegistro(e) {
+    // 2. REGISTRAR / ABRIR ORDEN DE TRABAJO
+    function crearNuevaOrden(e) {
       e.preventDefault();
-      if (!document.getElementById('horaInicio').value || !document.getElementById('horaFin').value) {
-        alert("Debe registrar la Hora de Inicio y Fin.");
-        return;
-      }
 
-      const otActual = document.getElementById('ordenTrabajo').value;
-      const registro = {
-        ordenTrabajo: otActual,
+      const otCodigo = document.getElementById('ordenTrabajo').value;
+      const horaInicioObj = new Date();
+
+      const nuevaOrden = {
+        id: Date.now(),
+        ordenTrabajo: otCodigo,
         mecanico: document.getElementById('mecanico').value,
         trabajoRealizar: document.getElementById('trabajoRealizar').value,
         operacion: document.getElementById('operacion').value,
@@ -366,24 +443,90 @@
         codMaq: document.getElementById('codMaq').value,
         centroTrabajo: document.getElementById('centroTrabajo').value,
         maquinaSolicitante: document.getElementById('maquinaSolicitante').value,
-        horaInicio: document.getElementById('horaInicio').value,
-        horaFin: document.getElementById('horaFin').value,
-        totalTiempo: document.getElementById('totalTiempo').value,
-        observaciones: document.getElementById('observaciones').value
+        observaciones: document.getElementById('observaciones').value,
+        horaInicioTexto: horaInicioObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
+        fechaInicioMs: horaInicioObj.getTime()
       };
 
-      let historial = JSON.parse(localStorage.getItem('historialOrdenesCompletadas')) || [];
-      historial.push(registro);
-      localStorage.setItem('historialOrdenesCompletadas', JSON.stringify(historial));
+      // Guardar en array de ordenes ABIERTAS
+      let ordenesAbiertas = JSON.parse(localStorage.getItem('ordenesAbiertas')) || [];
+      ordenesAbiertas.push(nuevaOrden);
+      localStorage.setItem('ordenesAbiertas', JSON.stringify(ordenesAbiertas));
 
+      // Incrementar el correlativo para la siguiente vez
       let numSec = parseInt(localStorage.getItem('secuenciaOT')) || 1;
       localStorage.setItem('secuenciaOT', numSec + 1);
 
-      alert(`¡Orden ${otActual} guardada exitosamente!`);
-      document.getElementById('otForm').reset();
-      fechaInicioObj = null;
-      fechaFinObj = null;
-      cargarSiguienteOT();
+      cerrarModalNuevaOT();
+      cargarOrdenesAbiertas();
+    }
+
+    // 3. RENDERIZAR ÓRDENES EN PANTALLA PRINCIPAL
+    function cargarOrdenesAbiertas() {
+      const ordenesAbiertas = JSON.parse(localStorage.getItem('ordenesAbiertas')) || [];
+      const tbody = document.getElementById('tablaOrdenesAbiertas');
+      tbody.innerHTML = '';
+
+      if (ordenesAbiertas.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding: 20px; color:#64748b;">No hay órdenes de trabajo abiertas en este momento.</td></tr>`;
+        return;
+      }
+
+      ordenesAbiertas.forEach((ot) => {
+        const fila = document.createElement('tr');
+        fila.innerHTML = `
+          <td><strong>${ot.ordenTrabajo}</strong></td>
+          <td>${ot.mecanico}</td>
+          <td><b>${ot.trabajoRealizar}</b><br><small style="color:#64748b">${ot.operacion}</small></td>
+          <td><b>${ot.maquinaTaller}</b> (${ot.codMaq})<br><small style="color:#64748b">Planta: ${ot.maquinaSolicitante}</small></td>
+          <td>${ot.horaInicioTexto}</td>
+          <td><span class="badge-open">EN PROCESO</span></td>
+          <td>
+            <button class="btn-close-ot" onclick="cerrarOrden(${ot.id})">🏁 Finalizar Trabajo</button>
+          </td>
+        `;
+        tbody.appendChild(fila);
+      });
+    }
+
+    // 4. CERRAR Y FINALIZAR ORDEN (CALCULAR TIEMPO Y ENVIAR AL HISTORIAL)
+    function cerrarOrden(idOrden) {
+      let ordenesAbiertas = JSON.parse(localStorage.getItem('ordenesAbiertas')) || [];
+      const orden = ordenesAbiertas.find(o => o.id === idOrden);
+
+      if (!orden) return;
+
+      const horaFinObj = new Date();
+      const horaFinTexto = horaFinObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
+      // Calcular tiempo transcurrido
+      let diffMs = horaFinObj.getTime() - orden.fechaInicioMs;
+      let diffMins = Math.floor(diffMs / 60000);
+      let horas = Math.floor(diffMins / 60);
+      let minutos = diffMins % 60;
+
+      let tiempoTotal = "";
+      if (horas > 0) tiempoTotal += `${horas} hora(s) `;
+      tiempoTotal += `${minutos} min`;
+
+      // Guardar en el Historial definitivo (Admin)
+      const ordenCompletada = {
+        ...orden,
+        horaFin: horaFinTexto,
+        totalTiempo: tiempoTotal,
+        fechaCierre: horaFinObj.toISOString().split('T')[0]
+      };
+
+      let historial = JSON.parse(localStorage.getItem('historialOrdenesCompletadas')) || [];
+      historial.push(ordenCompletada);
+      localStorage.setItem('historialOrdenesCompletadas', JSON.stringify(historial));
+
+      // Eliminar de las abiertas
+      ordenesAbiertas = ordenesAbiertas.filter(o => o.id !== idOrden);
+      localStorage.setItem('ordenesAbiertas', JSON.stringify(ordenesAbiertas));
+
+      alert(`¡Orden ${orden.ordenTrabajo} finalizada con éxito!\nTiempo total: ${tiempoTotal}`);
+      cargarOrdenesAbiertas();
     }
   </script>
 </body>
