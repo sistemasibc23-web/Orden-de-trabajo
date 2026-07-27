@@ -13,6 +13,7 @@
       --border: #cbd5e1;
       --text: #0f172a;
       --success: #16a34a;
+      --danger: #ef4444;
     }
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -56,8 +57,23 @@
     .content {
       padding: 24px;
     }
-    
-    /* PANEL DE CONFIGURACIÓN Y FILTROS */
+
+    /* PANTALLA DE LOGIN */
+    #loginSection {
+      max-width: 380px;
+      margin: 40px auto;
+      background: white;
+      padding: 30px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+      text-align: center;
+    }
+
+    /* PANEL DE FILTROS */
+    #adminDashboard {
+      display: none;
+    }
     .filter-card {
       background: #f8fafc;
       padding: 16px;
@@ -65,7 +81,7 @@
       border: 1px solid var(--border);
       margin-bottom: 20px;
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
       gap: 12px;
       align-items: end;
     }
@@ -73,6 +89,7 @@
       display: flex;
       flex-direction: column;
       gap: 5px;
+      text-align: left;
     }
     label {
       font-size: 0.8rem;
@@ -95,11 +112,11 @@
       font-size: 0.85rem;
       transition: background 0.2s;
     }
-    .btn-primary { background-color: var(--accent); color: white; }
+    .btn-primary { background-color: var(--accent); color: white; width: 100%; }
     .btn-excel { background-color: var(--success); color: white; }
     .btn-print { background-color: #64748b; color: white; }
 
-    /* TABLA DE REPORTES */
+    /* TABLA */
     .table-responsive {
       overflow-x: auto;
       margin-top: 15px;
@@ -120,8 +137,6 @@
       text-transform: uppercase;
       font-size: 0.75rem;
     }
-    tr:hover { background-color: #f8fafc; }
-    
     .status-badge {
       background-color: #dcfce7;
       color: #15803d;
@@ -131,19 +146,8 @@
       font-size: 0.75rem;
     }
 
-    .config-section {
-      background: #fffbeb;
-      border: 1px solid #fde68a;
-      padding: 12px;
-      border-radius: 6px;
-      margin-bottom: 20px;
-      display: flex;
-      gap: 10px;
-      align-items: center;
-    }
-
     @media print {
-      .filter-card, .config-section, .btn-back, .btn { display: none !important; }
+      .filter-card, .btn-back, .btn, #loginSection { display: none !important; }
       body { background: white; padding: 0; }
       .container { box-shadow: none; border: none; }
     }
@@ -153,234 +157,166 @@
 
   <div class="container">
     <div class="header">
-      <h1>📊 Panel de Reportería — Órdenes Completadas</h1>
+      <h1>📊 Admin — Reportería de Órdenes</h1>
       <a href="index.html" class="btn-back">← Volver al Taller</a>
     </div>
 
     <div class="content">
 
-      <!-- CREDENCIALES DE NETLIFY API -->
-      <div class="config-section">
-        <div class="form-group" style="flex:1;">
-          <label>Token Personal de Netlify (API Key)</label>
-          <input type="password" id="netlifyToken" placeholder="nfp_xxxxxxxxxxxx..." value="">
+      <!-- FORMULARIO DE ACCESO ADMIN -->
+      <div id="loginSection">
+        <h2 style="margin-top:0;">🔒 Acceso Administrador</h2>
+        <p style="font-size:0.85rem; color:#64748b; margin-bottom:20px;">Ingresa la clave de acceso para ver reportes</p>
+        <div class="form-group" style="margin-bottom:15px;">
+          <label for="adminPass">Contraseña</label>
+          <input type="password" id="adminPass" placeholder="••••••••">
         </div>
-        <div class="form-group" style="flex:1;">
-          <label>ID del Sitio (Site ID / API ID)</label>
-          <input type="text" id="netlifySiteId" placeholder="e.g. 1234abcd-..." value="">
-        </div>
-        <button class="btn btn-primary" onclick="guardarConfiguracion()">💾 Guardar y Cargar</button>
+        <button class="btn btn-primary" onclick="validarAcceso()">Ingresar</button>
+        <p id="loginError" style="color:var(--danger); font-size:0.8rem; margin-top:10px; display:none;">Contraseña incorrecta</p>
       </div>
 
-      <!-- FILTROS Y EXPORTACIÓN -->
-      <div class="filter-card">
-        <div class="form-group">
-          <label for="fechaDesde">Fecha Desde</label>
-          <input type="date" id="fechaDesde">
+      <!-- DASHBOARD ADMIN (OCULTO HASTA AUTENTICAR) -->
+      <div id="adminDashboard">
+        <div class="filter-card">
+          <div class="form-group">
+            <label for="fechaDesde">Fecha Desde</label>
+            <input type="date" id="fechaDesde">
+          </div>
+
+          <div class="form-group">
+            <label for="fechaHasta">Fecha Hasta</label>
+            <input type="date" id="fechaHasta">
+          </div>
+
+          <div class="form-group">
+            <label for="filtroMecanico">Mecánico</label>
+            <select id="filtroMecanico">
+              <option value="">-- Todos --</option>
+              <option value="HECTOR VIEJO">HECTOR VIEJO</option>
+              <option value="ANTHONY ZAMBRANO">ANTHONY ZAMBRANO</option>
+              <option value="XAVIER LEON">XAVIER LEON</option>
+              <option value="FERNANDO PIGUAVE">FERNANDO PIGUAVE</option>
+              <option value="ANDRES MORALES">ANDRES MORALES</option>
+              <option value="CRISTOPHER RUSSO">CRISTOPHER RUSSO</option>
+              <option value="BOLIVAR GOYON">BOLIVAR GOYON</option>
+            </select>
+          </div>
+
+          <div style="display: flex; gap: 8px;">
+            <button class="btn btn-primary" style="width:auto;" onclick="aplicarFiltros()">🔍 Filtrar</button>
+            <button class="btn btn-excel" onclick="exportarExcel()">📥 Excel</button>
+            <button class="btn btn-print" onclick="window.print()">🖨️ Imprimir</button>
+          </div>
         </div>
 
-        <div class="form-group">
-          <label for="fechaHasta">Fecha Hasta</label>
-          <input type="date" id="fechaHasta">
+        <div class="table-responsive">
+          <table>
+            <thead>
+              <tr>
+                <th>Fecha</th>
+                <th>OT</th>
+                <th>Mecánico</th>
+                <th>Trabajo / Operación</th>
+                <th>Máquina Solicitante</th>
+                <th>Horario</th>
+                <th>Tiempo Total</th>
+                <th>Observaciones</th>
+              </tr>
+            </thead>
+            <tbody id="tablaReportes">
+              <!-- Se puebla vía Javascript -->
+            </tbody>
+          </table>
         </div>
-
-        <div class="form-group">
-          <label for="filtroMecanico">Mecánico</label>
-          <select id="filtroMecanico">
-            <option value="">-- Todos --</option>
-            <option value="HECTOR VIEJO">HECTOR VIEJO</option>
-            <option value="ANTHONY ZAMBRANO">ANTHONY ZAMBRANO</option>
-            <option value="XAVIER LEON">XAVIER LEON</option>
-            <option value="FERNANDO PIGUAVE">FERNANDO PIGUAVE</option>
-            <option value="ANDRES MORALES">ANDRES MORALES</option>
-            <option value="CRISTOPHER RUSSO">CRISTOPHER RUSSO</option>
-            <option value="BOLIVAR GOYON">BOLIVAR GOYON</option>
-          </select>
-        </div>
-
-        <div style="display: flex; gap: 8px;">
-          <button class="btn btn-primary" onclick="aplicarFiltros()">🔍 Filtrar</button>
-          <button class="btn btn-excel" onclick="exportarExcel()">📥 Excel</button>
-          <button class="btn btn-print" onclick="window.print()">🖨️ Imprimir</button>
-        </div>
-      </div>
-
-      <!-- TABLA DE RESULTADOS -->
-      <div class="table-responsive">
-        <table>
-          <thead>
-            <tr>
-              <th>Fecha</th>
-              <th>OT</th>
-              <th>Mecánico</th>
-              <th>Trabajo</th>
-              <th>Máquina Solicitante</th>
-              <th>Inicio / Fin</th>
-              <th>Tiempo Total</th>
-              <th>Observaciones</th>
-            </tr>
-          </thead>
-          <tbody id="tablaReportes">
-            <tr>
-              <td colspan="8" style="text-align:center; color:#64748b; padding:20px;">
-                Ingresa tu Token y Site ID de Netlify para obtener los registros.
-              </td>
-            </tr>
-          </tbody>
-        </table>
       </div>
 
     </div>
   </div>
 
   <script>
-    let ordenesGlobales = [];
+    const CLAVE_ADMIN = "admin123"; // Puedes cambiar esta contraseña
+    let historialCompletadas = [];
 
-    window.addEventListener('DOMContentLoaded', () => {
-      // Cargar credenciales guardadas en localStorage
-      const savedToken = localStorage.getItem('netlifyToken') || '';
-      const savedSiteId = localStorage.getItem('netlifySiteId') || '';
-
-      document.getElementById('netlifyToken').value = savedToken;
-      document.getElementById('netlifySiteId').value = savedSiteId;
-
-      if (savedToken && savedSiteId) {
-        consultarNetlifyAPI(savedToken, savedSiteId);
-      }
-    });
-
-    function guardarConfiguracion() {
-      const token = document.getElementById('netlifyToken').value.trim();
-      const siteId = document.getElementById('netlifySiteId').value.trim();
-
-      if (!token || !siteId) {
-        alert("Por favor ingresa tanto el Token como el Site ID de Netlify.");
-        return;
-      }
-
-      localStorage.setItem('netlifyToken', token);
-      localStorage.setItem('netlifySiteId', siteId);
-
-      consultarNetlifyAPI(token, siteId);
-    }
-
-    // OBTENER SUBMISSIONS DE LA API DE NETLIFY
-    async function consultarNetlifyAPI(token, siteId) {
-      const tbody = document.getElementById('tablaReportes');
-      tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;">Cargando datos desde Netlify...</td></tr>';
-
-      try {
-        // 1. Obtener la lista de formularios para encontrar el ID del formulario "otFormNetlify"
-        const formsResponse = await fetch(`https://api.netlify.com/api/v1/sites/${siteId}/forms`, {
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
-
-        if (!formsResponse.ok) throw new Error("Error consultando la API. Revisa el Token o Site ID.");
-
-        const forms = await formsResponse.json();
-        // Buscar el formulario específico
-        const otForm = forms.find(f => f.name === 'otFormNetlify' || f.name === 'otForm');
-
-        if (!otForm) {
-          tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; color:red;">No se encontró la bandeja "otFormNetlify". Envía al menos una orden completada desde el taller.</td></tr>';
-          return;
-        }
-
-        // 2. Obtener los envíos/submissions del formulario encontrado
-        const subResponse = await fetch(`https://api.netlify.com/api/v1/forms/${otForm.id}/submissions`, {
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
-
-        const submissions = await subResponse.json();
-        ordenesGlobales = submissions;
-
-        renderizarTabla(ordenesGlobales);
-
-      } catch (error) {
-        tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; color:red;">Error: ${error.message}</td></tr>`;
+    function validarAcceso() {
+      const pass = document.getElementById('adminPass').value;
+      if (pass === CLAVE_ADMIN) {
+        document.getElementById('loginSection').style.display = 'none';
+        document.getElementById('adminDashboard').style.display = 'block';
+        cargarHistorial();
+      } else {
+        document.getElementById('loginError').style.display = 'block';
       }
     }
 
-    // MOSTRAR DATOS EN LA TABLA CON FILTROS APLICADOS
+    function cargarHistorial() {
+      historialCompletadas = JSON.parse(localStorage.getItem('historialOrdenesCompletadas')) || [];
+      renderizarTabla(historialCompletadas);
+    }
+
     function renderizarTabla(datos) {
       const tbody = document.getElementById('tablaReportes');
       tbody.innerHTML = '';
 
       if (datos.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; color:#64748b;">No hay registros para mostrar.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; color:#64748b; padding:20px;">No hay registros finalizados acumulados.</td></tr>';
         return;
       }
 
-      datos.forEach(sub => {
-        const d = sub.data;
-        // Fecha formateada YYYY-MM-DD
-        const fechaEnvio = sub.created_at ? sub.created_at.split('T')[0] : 'N/A';
-
+      datos.forEach(ot => {
         const fila = `<tr>
-          <td><strong>${fechaEnvio}</strong></td>
-          <td>${d.ordenTrabajo || 'N/A'}</td>
-          <td>${d.mecanico || 'N/A'}</td>
-          <td>${d.trabajoRealizar || 'N/A'} (${d.operacion || ''})</td>
-          <td>${d.maquinaSolicitante || 'N/A'}</td>
-          <td>${d.horaInicio || ''} - ${d.horaFin || ''}</td>
-          <td><span class="status-badge">${d.totalTiempo || 'N/A'}</span></td>
-          <td>${d.observaciones || '-'}</td>
+          <td><strong>${ot.fechaCierre || 'N/A'}</strong></td>
+          <td>${ot.ordenTrabajo}</td>
+          <td>${ot.mecanico}</td>
+          <td>${ot.trabajoRealizar} (${ot.operacion})</td>
+          <td>${ot.maquinaSolicitante}</td>
+          <td>${ot.horaInicio} - ${ot.horaFin}</td>
+          <td><span class="status-badge">${ot.totalTiempo}</span></td>
+          <td>${ot.observaciones || '-'}</td>
         </tr>`;
         tbody.innerHTML += fila;
       });
     }
 
-    // LÓGICA DEL FILTRO DE FECHAS Y MECÁNICO
     function aplicarFiltros() {
       const desde = document.getElementById('fechaDesde').value;
       const hasta = document.getElementById('fechaHasta').value;
       const mecanico = document.getElementById('filtroMecanico').value;
 
-      const filtrados = ordenesGlobales.filter(sub => {
-        const d = sub.data;
-        const fechaSub = sub.created_at ? sub.created_at.split('T')[0] : '';
-
-        // Filtro Fecha Desde
-        if (desde && fechaSub < desde) return false;
-        // Filtro Fecha Hasta
-        if (hasta && fechaSub > hasta) return false;
-        // Filtro Mecánico
-        if (mecanico && d.mecanico !== mecanico) return false;
-
+      const filtrados = historialCompletadas.filter(ot => {
+        const fechaOt = ot.fechaCierre;
+        if (desde && fechaOt < desde) return false;
+        if (hasta && fechaOt > hasta) return false;
+        if (mecanico && ot.mecanico !== mecanico) return false;
         return true;
       });
 
       renderizarTabla(filtrados);
     }
 
-    // EXPORTAR TABLA A FORMATO EXCEL / CSV
     function exportarExcel() {
-      if (ordenesGlobales.length === 0) {
-        alert("No hay datos para exportar");
+      if (historialCompletadas.length === 0) {
+        alert("No hay datos registrados para exportar.");
         return;
       }
 
       let csvContent = "data:text/csv;charset=utf-8,";
       csvContent += "Fecha,OT,Mecanico,Trabajo,Operacion,Maquina Taller,Cod Maq,Centro Trabajo,Maquina Solicitante,Hora Inicio,Hora Fin,Tiempo Total,Observaciones\n";
 
-      ordenesGlobales.forEach(sub => {
-        const d = sub.data;
-        const fechaSub = sub.created_at ? sub.created_at.split('T')[0] : 'N/A';
-        
+      historialCompletadas.forEach(ot => {
         const row = [
-          `"${fechaSub}"`,
-          `"${d.ordenTrabajo || ''}"`,
-          `"${d.mecanico || ''}"`,
-          `"${d.trabajoRealizar || ''}"`,
-          `"${d.operacion || ''}"`,
-          `"${d.maquinaTaller || ''}"`,
-          `"${d.codMaq || ''}"`,
-          `"${d.centroTrabajo || ''}"`,
-          `"${d.maquinaSolicitante || ''}"`,
-          `"${d.horaInicio || ''}"`,
-          `"${d.horaFin || ''}"`,
-          `"${d.totalTiempo || ''}"`,
-          `"${(d.observaciones || '').replace(/"/g, '""')}"`
+          `"${ot.fechaCierre || ''}"`,
+          `"${ot.ordenTrabajo || ''}"`,
+          `"${ot.mecanico || ''}"`,
+          `"${ot.trabajoRealizar || ''}"`,
+          `"${ot.operacion || ''}"`,
+          `"${ot.maquinaTaller || ''}"`,
+          `"${ot.codMaq || ''}"`,
+          `"${ot.centroTrabajo || ''}"`,
+          `"${ot.maquinaSolicitante || ''}"`,
+          `"${ot.horaInicio || ''}"`,
+          `"${ot.horaFin || ''}"`,
+          `"${ot.totalTiempo || ''}"`,
+          `"${(ot.observaciones || '').replace(/"/g, '""')}"`
         ];
         csvContent += row.join(",") + "\n";
       });
@@ -388,7 +324,7 @@
       const encodedUri = encodeURI(csvContent);
       const link = document.createElement("a");
       link.setAttribute("href", encodedUri);
-      link.setAttribute("download", `reporte_ordenes_mantenimiento_${new Date().toISOString().split('T')[0]}.csv`);
+      link.setAttribute("download", `reporte_mantenimiento_${new Date().toISOString().split('T')[0]}.csv`);
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
