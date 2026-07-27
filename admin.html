@@ -228,49 +228,142 @@
   </div>
 
   <script>
-    // CREDENCIALES CONFIGURADAS (Puedes cambiarlas aquí)
-    const ADMIN_USER = "admin";
-    const ADMIN_PASS = "12345";
+    // CONFIGURACIÓN DE ACCESO Y NETLIFY
+const ADMIN_USER = "admin";
+const ADMIN_PASS = "12345";
 
-    // CONTROL DE ACCESO
-    document.getElementById('loginForm').addEventListener('submit', function(e) {
-      e.preventDefault();
-      const user = document.getElementById('userInput').value;
-      const pass = document.getElementById('passInput').value;
+const NETLIFY_TOKEN = "PEGA_AQUI_TU_PERSONAL_ACCESS_TOKEN";
+const NETLIFY_SITE_ID = "PEGA_AQUI_TU_SITE_ID";
 
-      if (user === ADMIN_USER && pass === ADMIN_PASS) {
-        document.getElementById('loginModal').style.display = 'none';
-        document.getElementById('dashboardContent').style.display = 'block';
-        sessionStorage.setItem('adminAutenticado', 'true');
-      } else {
-        document.getElementById('errorMessage').style.display = 'block';
-      }
+let datosGlobales = []; // Guarda las OTs cargadas
+
+// AUTENTICACIÓN
+document.getElementById('loginForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+  const user = document.getElementById('userInput').value;
+  const pass = document.getElementById('passInput').value;
+
+  if (user === ADMIN_USER && pass === ADMIN_PASS) {
+    document.getElementById('loginModal').style.display = 'none';
+    document.getElementById('dashboardContent').style.display = 'block';
+    sessionStorage.setItem('adminAutenticado', 'true');
+    cargarDatosNetlify();
+  } else {
+    document.getElementById('errorMessage').style.display = 'block';
+  }
+});
+
+window.addEventListener('DOMContentLoaded', () => {
+  if (sessionStorage.getItem('adminAutenticado') === 'true') {
+    document.getElementById('loginModal').style.display = 'none';
+    document.getElementById('dashboardContent').style.display = 'block';
+    cargarDatosNetlify();
+  }
+});
+
+function cerrarSesion() {
+  sessionStorage.removeItem('adminAutenticado');
+  location.reload();
+}
+
+// CARGAR DATOS DESDE NETLIFY FORMS
+async function cargarDatosNetlify() {
+  try {
+    // 1. Obtener los formularios del sitio
+    const formsResponse = await fetch(`https://api.netlify.com/api/v1/sites/${NETLIFY_SITE_ID}/forms`, {
+      headers: { Authorization: `Bearer ${NETLIFY_TOKEN}` }
     });
+    const forms = await formsResponse.json();
+    if (!forms || forms.length === 0) return;
 
-    // MANTENER SESIÓN ACTIVA AL NAVEGAR
-    window.addEventListener('DOMContentLoaded', () => {
-      if (sessionStorage.getItem('adminAutenticado') === 'true') {
-        document.getElementById('loginModal').style.display = 'none';
-        document.getElementById('dashboardContent').style.display = 'block';
-      }
+    const formId = forms[0].id;
+
+    // 2. Obtener los envíos (submissions) de las OTs
+    const subResponse = await fetch(`https://api.netlify.com/api/v1/forms/${formId}/submissions`, {
+      headers: { Authorization: `Bearer ${NETLIFY_TOKEN}` }
     });
+    const submissions = await subResponse.json();
 
-    function cerrarSesion() {
-      sessionStorage.removeItem('adminAutenticado');
-      location.reload();
-    }
+    // Mapear los datos limpios
+    datosGlobales = submissions.map(sub => ({
+      Fecha: new Date(sub.created_at).toLocaleDateString(),
+      FechaRaw: new Date(sub.created_at),
+      OT: sub.data.ordenTrabajo || 'N/A',
+      Mecanico: sub.data.mecanico || 'Sin Asignar',
+      Trabajo: sub.data.trabajoRealizar || '',
+      Operacion: sub.data.operacion || '',
+      MaquinaTaller: sub.data.maquinaTaller || '',
+      CodMaq: sub.data.codMaq || '',
+      CentroTrabajo: sub.data.centroTrabajo || '',
+      MaquinaPlanta: sub.data.maquinaSolicitante || '',
+      HoraInicio: sub.data.horaInicio || '',
+      HoraFin: sub.data.horaFin || '',
+      TotalTiempo: sub.data.totalTiempo || '',
+      Observaciones: sub.data.observaciones || ''
+    }));
 
-    // EXPORTACIÓN A EXCEL
-    function exportarExcel() {
-      let tabla = document.querySelector("table");
-      let wb = XLSX.utils.table_to_book(tabla, { sheet: "Resumen Mecánicos" });
-      XLSX.writeFile(wb, "Reporte_Ordenes_Mantenimiento.xlsx");
-    }
+    renderizarDashboard(datosGlobales);
 
-    function filtrarDatos() {
-      // Lógica para filtrar las OTs según el rango de fechas
-    }
-  </script>
+  } catch (error) {
+    console.error("Error cargando registros:", error);
+  }
+}
 
-</body>
-</html>
+// RENDERIZAR TABLAS Y MÉTRICAS
+function renderizarDashboard(datos) {
+  document.getElementById('totalOrdenes').innerText = datos.length;
+
+  // Agrupar órdenes por mecánico
+  const conteoMecanicos = {};
+  datos.forEach(d => {
+    conteoMecanicos[d.Mecanico] = (conteoMecanicos[d.Mecanico] || 0) + 1;
+  });
+
+  document.getElementById('totalMecanicos').innerText = Object.keys(conteoMecanicos).length;
+
+  const tbody = document.getElementById('tablaMecanicos');
+  tbody.innerHTML = '';
+
+  Object.keys(conteoMecanicos).forEach(mecanico => {
+    const fila = `<tr>
+      <td>${mecanico}</td>
+      <td><strong>${conteoMecanicos[mecanico]}</strong></td>
+    </tr>`;
+    tbody.innerHTML += fila;
+  });
+}
+
+// FILTRAR POR FECHAS
+function filtrarDatos() {
+  const desdeVal = document.getElementById('fechaInicio').value;
+  const hastaVal = document.getElementById('fechaFin').value;
+
+  if (!desdeVal || !hastaVal) {
+    renderizarDashboard(datosGlobales);
+    return;
+  }
+
+  const desde = new Date(desdeVal);
+  const hasta = new Date(hastaVal);
+  hasta.setHours(23, 59, 59);
+
+  const filtrados = datosGlobales.filter(d => d.FechaRaw >= desde && d.FechaRaw <= hasta);
+  renderizarDashboard(filtrados);
+}
+
+// EXPORTAR A EXCEL (DESCARGA COMPLETA)
+function exportarExcel() {
+  if (datosGlobales.length === 0) {
+    alert("No hay registros disponibles para exportar.");
+    return;
+  }
+
+  // Prepara los datos eliminando campos internos
+  const datosExcel = datosGlobales.map(({ FechaRaw, ...resto }) => resto);
+
+  const hoja = XLSX.utils.json_to_sheet(datosExcel);
+  const libro = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(libro, hoja, "Ordenes_Trabajo");
+
+  XLSX.writeFile(libro, `Reporte_OT_Taller_${new Date().toISOString().slice(0,10)}.xlsx`);
+}
