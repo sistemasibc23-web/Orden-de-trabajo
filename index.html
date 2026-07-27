@@ -121,7 +121,7 @@
     #formSection {
       display: none;
     }
-    form {
+    #formSection form {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 16px;
@@ -431,7 +431,7 @@
         method: 'POST',
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: new URLSearchParams({
-          "form-name": "otForm",
+          "form-name": "otFormNetlify",
           ...datosFinales
         }).toString()
       })
@@ -447,8 +447,8 @@
     }
   </script>
 
-  <!-- FORMULARIO OCULTO PARA QUE NETLIFY DETECTE LOS CAMPOS -->
-  <form name="otForm" data-netlify="true" hidden>
+  <!-- FORMULARIO OCULTO TOTALMENTE INVISIBLE PARA NETLIFY -->
+  <form name="otFormNetlify" data-netlify="true" style="display: none !important;">
     <input type="text" name="ordenTrabajo">
     <input type="text" name="mecanico">
     <input type="text" name="trabajoRealizar">
