@@ -31,8 +31,6 @@
       border: 1px solid var(--border);
       overflow: hidden;
     }
-    
-    /* ENCABEZADO Y BOTÓN ADMIN COMPACTO */
     .header {
       background: var(--primary);
       color: #fff;
@@ -70,17 +68,13 @@
     .btn-admin:hover {
       background-color: rgba(255, 255, 255, 0.3);
     }
-
-    /* FORMULARIO Y CAMPOS */
     form {
       padding: 24px;
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 16px;
     }
-    .full-width {
-      grid-column: 1 / -1;
-    }
+    .full-width { grid-column: 1 / -1; }
     .form-group {
       display: flex;
       flex-direction: column;
@@ -110,15 +104,11 @@
       resize: vertical;
       min-height: 80px;
     }
-    
-    /* TIEMPOS Y BOTONES AUTOMÁTICOS */
     .time-container {
       display: flex;
       gap: 8px;
     }
-    .time-container input {
-      flex: 1;
-    }
+    .time-container input { flex: 1; }
     .btn-time {
       background-color: #475569;
       color: white;
@@ -129,14 +119,11 @@
       cursor: pointer;
       font-weight: 600;
     }
-    .btn-time:hover {
-      background-color: #334155;
-    }
+    .btn-time:hover { background-color: #334155; }
     .readonly-input {
       background-color: #e2e8f0 !important;
       font-weight: bold;
     }
-    
     .btn-submit {
       grid-column: 1 / -1;
       background-color: var(--accent);
@@ -151,18 +138,11 @@
       transition: background 0.2s;
       margin-top: 10px;
     }
-    .btn-submit:hover {
-      background-color: #1d4ed8;
-    }
+    .btn-submit:hover { background-color: #1d4ed8; }
 
     @media (max-width: 600px) {
-      form {
-        grid-template-columns: 1fr;
-      }
-      .btn-admin {
-        position: static;
-        margin-bottom: 10px;
-      }
+      form { grid-template-columns: 1fr; }
+      .btn-admin { position: static; margin-bottom: 10px; }
     }
   </style>
 </head>
@@ -175,31 +155,15 @@
       <p>Gestión y Control de Piso de Taller</p>
     </div>
 
-    <!-- FORMULARIO OCULTO PARA RESPALDO SILENCIOSO NETLIFY -->
-    <form name="otFormNetlify" netlify netlify-honeypot="bot-field" hidden>
-      <input type="text" name="ordenTrabajo" />
-      <input type="text" name="mecanico" />
-      <input type="text" name="trabajoRealizar" />
-      <input type="text" name="operacion" />
-      <input type="text" name="maquinaTaller" />
-      <input type="text" name="codMaq" />
-      <input type="text" name="centroTrabajo" />
-      <input type="text" name="maquinaSolicitante" />
-      <input type="text" name="horaInicio" />
-      <input type="text" name="horaFin" />
-      <input type="text" name="totalTiempo" />
-      <textarea name="observaciones"></textarea>
-    </form>
-
     <form id="otForm" onsubmit="guardarRegistro(event)">
       
-      <!-- Campo 1: Orden de Trabajo (Bloqueado y Secuencial) -->
+      <!-- OT Secuencial Bloqueada -->
       <div class="form-group">
         <label for="ordenTrabajo">Orden de Trabajo (OT)</label>
         <input type="text" id="ordenTrabajo" name="ordenTrabajo" value="OT/0001" readonly class="readonly-input">
       </div>
 
-      <!-- Campo 2: Mecánico -->
+      <!-- Mecánico -->
       <div class="form-group">
         <label for="mecanico">Mecánico Asignado</label>
         <select id="mecanico" name="mecanico" required>
@@ -216,7 +180,7 @@
         </select>
       </div>
 
-      <!-- Campo 3: Trabajo a Realizar -->
+      <!-- Trabajo a Realizar -->
       <div class="form-group full-width">
         <label for="trabajoRealizar">Trabajo a Realizar</label>
         <select id="trabajoRealizar" name="trabajoRealizar" required>
@@ -233,7 +197,7 @@
         </select>
       </div>
 
-      <!-- Campo 4: Operación -->
+      <!-- Operación -->
       <div class="form-group">
         <label for="operacion">Operación</label>
         <select id="operacion" name="operacion" required>
@@ -253,7 +217,7 @@
         </select>
       </div>
 
-      <!-- Campo 5: Máquina del Taller -->
+      <!-- Máquina Taller -->
       <div class="form-group">
         <label for="maquinaTaller">Máquina Taller</label>
         <select id="maquinaTaller" name="maquinaTaller" required>
@@ -265,7 +229,7 @@
         </select>
       </div>
 
-      <!-- Campo 6: Código Máquina Taller -->
+      <!-- COD-MAQ -->
       <div class="form-group">
         <label for="codMaq">Cód. Máquina Taller (COD-MAQ)</label>
         <select id="codMaq" name="codMaq" required>
@@ -278,7 +242,7 @@
         </select>
       </div>
 
-      <!-- Campo 7: Centro de Trabajo -->
+      <!-- Centro Trabajo -->
       <div class="form-group">
         <label for="centroTrabajo">Centro de Trabajo</label>
         <select id="centroTrabajo" name="centroTrabajo" required>
@@ -290,7 +254,7 @@
         </select>
       </div>
 
-      <!-- Campo 8: Máquina Solicitante / Planta -->
+      <!-- Máquina Solicitante -->
       <div class="form-group full-width">
         <label for="maquinaSolicitante">Máquina Solicitante / Planta</label>
         <select id="maquinaSolicitante" name="maquinaSolicitante" required>
@@ -304,7 +268,7 @@
         </select>
       </div>
 
-      <!-- Campo 9: Hora Inicio Automática -->
+      <!-- Horas y Tiempos -->
       <div class="form-group">
         <label for="horaInicio">Hora Inicio Trabajo</label>
         <div class="time-container">
@@ -313,7 +277,6 @@
         </div>
       </div>
 
-      <!-- Campo 10: Hora Fin Automática -->
       <div class="form-group">
         <label for="horaFin">Hora Fin Trabajo</label>
         <div class="time-container">
@@ -322,16 +285,14 @@
         </div>
       </div>
 
-      <!-- Campo 11: Total Tiempo Calculado -->
       <div class="form-group full-width">
         <label for="totalTiempo">Total Tiempo Transcurrido</label>
         <input type="text" id="totalTiempo" name="totalTiempo" placeholder="Calculado automáticamente..." readonly class="readonly-input">
       </div>
 
-      <!-- Campo 12: Observaciones -->
       <div class="form-group full-width">
         <label for="observaciones">Observaciones / Novedades</label>
-        <textarea id="observaciones" name="observaciones" placeholder="Escriba aquí detalles adicionales del trabajo realizado..."></textarea>
+        <textarea id="observaciones" name="observaciones" placeholder="Escriba aquí detalles adicionales..."></textarea>
       </div>
 
       <button type="submit" class="btn-submit">Registrar Orden de Trabajo</button>
@@ -339,16 +300,12 @@
     </form>
   </div>
 
-  <!-- CÓDIGO JAVASCRIPT PARA SECUENCIA Y TIEMPOS -->
   <script>
     let fechaInicioObj = null;
     let fechaFinObj = null;
 
-    window.addEventListener('DOMContentLoaded', () => {
-      cargarSiguienteOT();
-    });
+    window.addEventListener('DOMContentLoaded', cargarSiguienteOT);
 
-    // 1. GENERAR SECUENCIA CORRELATIVA AUTOMÁTICA
     function cargarSiguienteOT() {
       let numSecuencia = parseInt(localStorage.getItem('secuenciaOT')) || 1;
       let codigoOT = "OT/" + numSecuencia.toString().padStart(4, '0');
@@ -378,40 +335,29 @@
     function calcularDiferencia() {
       if (fechaInicioObj && fechaFinObj) {
         let diffMs = fechaFinObj - fechaInicioObj;
-        
         if (diffMs < 0) {
-          document.getElementById('totalTiempo').value = "Error: Hora Fin anterior a Hora Inicio";
+          document.getElementById('totalTiempo').value = "Error en horas";
           return;
         }
-
         let diffMins = Math.floor(diffMs / 60000);
         let horas = Math.floor(diffMins / 60);
         let minutos = diffMins % 60;
-
-        let resultado = "";
-        if (horas > 0) {
-          resultado += `${horas} hora(s) `;
-        }
-        resultado += `${minutos} min`;
-
-        document.getElementById('totalTiempo').value = resultado;
+        let res = "";
+        if (horas > 0) res += `${horas}h `;
+        res += `${minutos} min`;
+        document.getElementById('totalTiempo').value = res;
       }
     }
 
-    // 2. GUARDAR REGISTRO E INCREMENTAR EL CORRELATIVO
-    function guardarRegistro(event) {
-      event.preventDefault();
-
+    function guardarRegistro(e) {
+      e.preventDefault();
       if (!document.getElementById('horaInicio').value || !document.getElementById('horaFin').value) {
-        alert("Debe registrar la Hora de Inicio y Fin antes de guardar.");
+        alert("Debe registrar la Hora de Inicio y Fin.");
         return;
       }
 
       const otActual = document.getElementById('ordenTrabajo').value;
-      const hoy = new Date().toISOString().split('T')[0];
-
       const registro = {
-        fechaCierre: hoy,
         ordenTrabajo: otActual,
         mecanico: document.getElementById('mecanico').value,
         trabajoRealizar: document.getElementById('trabajoRealizar').value,
@@ -426,34 +372,19 @@
         observaciones: document.getElementById('observaciones').value
       };
 
-      // Guardar en el historial local para el Panel Admin
       let historial = JSON.parse(localStorage.getItem('historialOrdenesCompletadas')) || [];
       historial.push(registro);
       localStorage.setItem('historialOrdenesCompletadas', JSON.stringify(historial));
 
-      // Respaldo en Netlify Forms
-      fetch('/', {
-        method: 'POST',
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: new URLSearchParams({
-          "form-name": "otFormNetlify",
-          ...registro
-        }).toString()
-      }).catch(err => console.log("Error respaldo:", err));
+      let numSec = parseInt(localStorage.getItem('secuenciaOT')) || 1;
+      localStorage.setItem('secuenciaOT', numSec + 1);
 
-      // Incrementar secuencia
-      let numSecuencia = parseInt(localStorage.getItem('secuenciaOT')) || 1;
-      localStorage.setItem('secuenciaOT', numSecuencia + 1);
-
-      alert(`¡Orden ${otActual} registrada con éxito!`);
-
-      // Resetear formulario y recargar el nuevo correlativo
+      alert(`¡Orden ${otActual} guardada exitosamente!`);
       document.getElementById('otForm').reset();
       fechaInicioObj = null;
       fechaFinObj = null;
       cargarSiguienteOT();
     }
   </script>
-
 </body>
 </html>
