@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Control Orden de Trabajo</title>
+  <title>Control de Trabajo — Taller de Mantenimiento</title>
   <style>
     :root {
       --bg: #f4f6f9;
@@ -237,7 +237,7 @@
     <!-- CABECERA PRINCIPAL -->
     <div class="header">
       <div>
-        <h1>Control Gestion de Taller</h1>
+        <h1>Control de Piso de Taller</h1>
         <p>Gestión de Órdenes Abiertas y Trabajo en Curso</p>
       </div>
       <div class="header-btns">
@@ -432,6 +432,7 @@
 
       const otCodigo = document.getElementById('ordenTrabajo').value;
       const horaInicioObj = new Date();
+      const horaTexto = horaInicioObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
 
       const nuevaOrden = {
         id: Date.now(),
@@ -444,7 +445,8 @@
         centroTrabajo: document.getElementById('centroTrabajo').value,
         maquinaSolicitante: document.getElementById('maquinaSolicitante').value,
         observaciones: document.getElementById('observaciones').value,
-        horaInicioTexto: horaInicioObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
+        horaInicio: horaTexto,        // <-- Corregido para Reportería / Admin
+        horaInicioTexto: horaTexto,   // <-- Para mantener en Dashboard
         fechaInicioMs: horaInicioObj.getTime()
       };
 
