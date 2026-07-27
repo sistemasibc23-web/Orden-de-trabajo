@@ -3,392 +3,396 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Panel Admin — Control de Órdenes</title>
-  <!-- Librería para generar y descargar archivos Excel de forma gratuita -->
-  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <title>Panel Admin — Reportería de Órdenes de Trabajo</title>
   <style>
     :root {
-      --bg: #f8fafc;
+      --bg: #f4f6f9;
       --card: #ffffff;
-      --primary: #0f172a;
+      --primary: #1e293b;
       --accent: #2563eb;
-      --border: #e2e8f0;
-      --text: #1e293b;
-      --danger: #dc2626;
+      --border: #cbd5e1;
+      --text: #0f172a;
+      --success: #16a34a;
     }
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       background-color: var(--bg);
       color: var(--text);
       margin: 0;
-      padding: 0;
-    }
-
-    /* PANTALLA DE INICIO DE SESIÓN (LOGIN) */
-    .login-modal {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(15, 23, 42, 0.85);
-      backdrop-filter: blur(4px);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      z-index: 1000;
-    }
-    .login-card {
-      background: var(--card);
-      padding: 32px;
-      border-radius: 12px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-      width: 100%;
-      max-width: 360px;
-      text-align: center;
-    }
-    .login-card h2 {
-      margin-top: 0;
-      font-size: 1.3rem;
-      color: var(--primary);
-    }
-    .login-form {
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-      margin-top: 20px;
-    }
-    .login-form input {
-      padding: 10px 12px;
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      font-size: 0.95rem;
-      outline: none;
-    }
-    .error-message {
-      color: var(--danger);
-      font-size: 0.85rem;
-      display: none;
-      margin-top: 6px;
-    }
-
-    /* CONTENEDOR DEL DASHBOARD */
-    .dashboard-container {
-      display: none;
       padding: 20px;
+    }
+    .container {
       max-width: 1100px;
       margin: 0 auto;
+      background: var(--card);
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      border: 1px solid var(--border);
+      overflow: hidden;
     }
     .header {
+      background: var(--primary);
+      color: #fff;
+      padding: 20px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 20px;
-      flex-wrap: wrap;
-      gap: 12px;
     }
-    .header-buttons {
-      display: flex;
-      gap: 10px;
+    .header h1 {
+      margin: 0;
+      font-size: 1.3rem;
+      text-transform: uppercase;
     }
-    .filters {
-      background: var(--card);
+    .btn-back {
+      background-color: rgba(255, 255, 255, 0.15);
+      color: #fff;
+      padding: 8px 14px;
+      border-radius: 6px;
+      text-decoration: none;
+      font-size: 0.85rem;
+      font-weight: bold;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+    .content {
+      padding: 24px;
+    }
+    
+    /* PANEL DE CONFIGURACIÓN Y FILTROS */
+    .filter-card {
+      background: #f8fafc;
       padding: 16px;
       border-radius: 8px;
       border: 1px solid var(--border);
-      display: flex;
-      gap: 16px;
-      align-items: flex-end;
       margin-bottom: 20px;
-      flex-wrap: wrap;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 12px;
+      align-items: end;
     }
-    .filter-group {
+    .form-group {
       display: flex;
       flex-direction: column;
-      gap: 4px;
+      gap: 5px;
     }
     label {
       font-size: 0.8rem;
-      font-weight: 600;
-      color: #64748b;
+      font-weight: bold;
+      color: #475569;
       text-transform: uppercase;
     }
-    input[type="date"] {
-      padding: 8px 12px;
+    input, select {
+      padding: 8px 10px;
       border: 1px solid var(--border);
       border-radius: 6px;
-      outline: none;
+      font-size: 0.9rem;
     }
     .btn {
-      padding: 9px 16px;
+      padding: 9px 15px;
       border-radius: 6px;
       border: none;
-      font-weight: 600;
+      font-weight: bold;
       cursor: pointer;
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       transition: background 0.2s;
     }
-    .btn-primary { background: var(--accent); color: white; }
-    .btn-primary:hover { background: #1d4ed8; }
-    .btn-excel { background: #16a34a; color: white; }
-    .btn-excel:hover { background: #15803d; }
-    .btn-logout { background: #64748b; color: white; }
-    .btn-logout:hover { background: #475569; }
-    
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 16px;
-      margin-bottom: 20px;
-    }
-    .stat-card {
-      background: var(--card);
-      padding: 20px;
-      border-radius: 8px;
-      border: 1px solid var(--border);
-    }
-    .stat-card h3 { margin: 0; font-size: 0.85rem; color: #64748b; text-transform: uppercase; }
-    .stat-card .value { font-size: 1.8rem; font-weight: bold; margin-top: 8px; color: var(--primary); }
+    .btn-primary { background-color: var(--accent); color: white; }
+    .btn-excel { background-color: var(--success); color: white; }
+    .btn-print { background-color: #64748b; color: white; }
 
+    /* TABLA DE REPORTES */
+    .table-responsive {
+      overflow-x: auto;
+      margin-top: 15px;
+    }
     table {
       width: 100%;
       border-collapse: collapse;
-      background: var(--card);
-      border-radius: 8px;
-      overflow: hidden;
-      border: 1px solid var(--border);
+      font-size: 0.85rem;
     }
     th, td {
-      padding: 12px 16px;
+      padding: 10px 12px;
       text-align: left;
       border-bottom: 1px solid var(--border);
     }
-    th { background: #f1f5f9; font-size: 0.8rem; text-transform: uppercase; color: #475569; }
+    th {
+      background: #f1f5f9;
+      color: #334155;
+      text-transform: uppercase;
+      font-size: 0.75rem;
+    }
+    tr:hover { background-color: #f8fafc; }
+    
+    .status-badge {
+      background-color: #dcfce7;
+      color: #15803d;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-weight: bold;
+      font-size: 0.75rem;
+    }
+
+    .config-section {
+      background: #fffbeb;
+      border: 1px solid #fde68a;
+      padding: 12px;
+      border-radius: 6px;
+      margin-bottom: 20px;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    @media print {
+      .filter-card, .config-section, .btn-back, .btn { display: none !important; }
+      body { background: white; padding: 0; }
+      .container { box-shadow: none; border: none; }
+    }
   </style>
 </head>
 <body>
 
-  <!-- VENTANA LOGIN -->
-  <div class="login-modal" id="loginModal">
-    <div class="login-card">
-      <h2>🔒 Acceso Administrativo</h2>
-      <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 0;">Ingrese credenciales de supervisor</p>
-      
-      <form class="login-form" id="loginForm">
-        <input type="text" id="userInput" placeholder="Usuario" required autocomplete="off">
-        <input type="password" id="passInput" placeholder="Contraseña" required>
-        <button type="submit" class="btn btn-primary">Ingresar al Dashboard</button>
-      </form>
-      <div class="error-message" id="errorMessage">Usuario o contraseña incorrectos</div>
-    </div>
-  </div>
-
-  <!-- PANEL DASHBOARD -->
-  <div class="dashboard-container" id="dashboardContent">
+  <div class="container">
     <div class="header">
-      <h2>Dashboard de Administración — Taller</h2>
-      <div class="header-buttons">
-        <button class="btn btn-excel" onclick="exportarExcel()">📊 Descargar Reporte Excel</button>
-        <button class="btn btn-logout" onclick="cerrarSesion()">Salir</button>
-      </div>
+      <h1>📊 Panel de Reportería — Órdenes Completadas</h1>
+      <a href="index.html" class="btn-back">← Volver al Taller</a>
     </div>
 
-    <!-- FILTROS DE FECHA -->
-    <div class="filters">
-      <div class="filter-group">
-        <label for="fechaInicio">Desde:</label>
-        <input type="date" id="fechaInicio">
-      </div>
-      <div class="filter-group">
-        <label for="fechaFin">Hasta:</label>
-        <input type="date" id="fechaFin">
-      </div>
-      <button class="btn btn-primary" onclick="filtrarDatos()">Filtrar</button>
-      <button class="btn btn-logout" onclick="limpiarFiltro()">Limpiar Filtro</button>
-    </div>
+    <div class="content">
 
-    <!-- TARJETAS CON MÉTRICAS -->
-    <div class="stats-grid">
-      <div class="stat-card">
-        <h3>Total Órdenes</h3>
-        <div class="value" id="totalOrdenes">0</div>
+      <!-- CREDENCIALES DE NETLIFY API -->
+      <div class="config-section">
+        <div class="form-group" style="flex:1;">
+          <label>Token Personal de Netlify (API Key)</label>
+          <input type="password" id="netlifyToken" placeholder="nfp_xxxxxxxxxxxx..." value="">
+        </div>
+        <div class="form-group" style="flex:1;">
+          <label>ID del Sitio (Site ID / API ID)</label>
+          <input type="text" id="netlifySiteId" placeholder="e.g. 1234abcd-..." value="">
+        </div>
+        <button class="btn btn-primary" onclick="guardarConfiguracion()">💾 Guardar y Cargar</button>
       </div>
-      <div class="stat-card">
-        <h3>Mecánicos Activos</h3>
-        <div class="value" id="totalMecanicos">0</div>
-      </div>
-    </div>
 
-    <!-- TABLA RESUMEN POR MECÁNICO -->
-    <h3>Resumen de Trabajos por Mecánico</h3>
-    <table>
-      <thead>
-        <tr>
-          <th>Mecánico</th>
-          <th>Total Órdenes Registradas</th>
-        </tr>
-      </thead>
-      <tbody id="tablaMecanicos">
-        <tr>
-          <td colspan="2" style="text-align:center; color:#64748b;">Cargando información...</td>
-        </tr>
-      </tbody>
-    </table>
+      <!-- FILTROS Y EXPORTACIÓN -->
+      <div class="filter-card">
+        <div class="form-group">
+          <label for="fechaDesde">Fecha Desde</label>
+          <input type="date" id="fechaDesde">
+        </div>
+
+        <div class="form-group">
+          <label for="fechaHasta">Fecha Hasta</label>
+          <input type="date" id="fechaHasta">
+        </div>
+
+        <div class="form-group">
+          <label for="filtroMecanico">Mecánico</label>
+          <select id="filtroMecanico">
+            <option value="">-- Todos --</option>
+            <option value="HECTOR VIEJO">HECTOR VIEJO</option>
+            <option value="ANTHONY ZAMBRANO">ANTHONY ZAMBRANO</option>
+            <option value="XAVIER LEON">XAVIER LEON</option>
+            <option value="FERNANDO PIGUAVE">FERNANDO PIGUAVE</option>
+            <option value="ANDRES MORALES">ANDRES MORALES</option>
+            <option value="CRISTOPHER RUSSO">CRISTOPHER RUSSO</option>
+            <option value="BOLIVAR GOYON">BOLIVAR GOYON</option>
+          </select>
+        </div>
+
+        <div style="display: flex; gap: 8px;">
+          <button class="btn btn-primary" onclick="aplicarFiltros()">🔍 Filtrar</button>
+          <button class="btn btn-excel" onclick="exportarExcel()">📥 Excel</button>
+          <button class="btn btn-print" onclick="window.print()">🖨️ Imprimir</button>
+        </div>
+      </div>
+
+      <!-- TABLA DE RESULTADOS -->
+      <div class="table-responsive">
+        <table>
+          <thead>
+            <tr>
+              <th>Fecha</th>
+              <th>OT</th>
+              <th>Mecánico</th>
+              <th>Trabajo</th>
+              <th>Máquina Solicitante</th>
+              <th>Inicio / Fin</th>
+              <th>Tiempo Total</th>
+              <th>Observaciones</th>
+            </tr>
+          </thead>
+          <tbody id="tablaReportes">
+            <tr>
+              <td colspan="8" style="text-align:center; color:#64748b; padding:20px;">
+                Ingresa tu Token y Site ID de Netlify para obtener los registros.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
   </div>
 
-  <!-- SCRIPT DE CONTROL Y CONEXIÓN CON NETLIFY -->
   <script>
-    // CREDENCIALES DE ACCESO AL DASHBOARD
-    const ADMIN_USER = "admin";
-    const ADMIN_PASS = "12345";
-
-    // COLOCAR AQUÍ TUS CLAVES DE NETLIFY
-    const NETLIFY_TOKEN = "nfp_g9LzhjrL6XgENuvwrp7UR1MFszSo1Dzh54b4";
-    const NETLIFY_SITE_ID = "e3c1dc51-eba6-470e-b197-cbb93bb22b4a";
-
-    let datosGlobales = [];
-
-    // MANEJO DE LOGIN
-    document.getElementById('loginForm').addEventListener('submit', function(e) {
-      e.preventDefault();
-      const user = document.getElementById('userInput').value;
-      const pass = document.getElementById('passInput').value;
-
-      if (user === ADMIN_USER && pass === ADMIN_PASS) {
-        document.getElementById('loginModal').style.display = 'none';
-        document.getElementById('dashboardContent').style.display = 'block';
-        sessionStorage.setItem('adminAutenticado', 'true');
-        cargarDatosNetlify();
-      } else {
-        document.getElementById('errorMessage').style.display = 'block';
-      }
-    });
+    let ordenesGlobales = [];
 
     window.addEventListener('DOMContentLoaded', () => {
-      if (sessionStorage.getItem('adminAutenticado') === 'true') {
-        document.getElementById('loginModal').style.display = 'none';
-        document.getElementById('dashboardContent').style.display = 'block';
-        cargarDatosNetlify();
+      // Cargar credenciales guardadas en localStorage
+      const savedToken = localStorage.getItem('netlifyToken') || '';
+      const savedSiteId = localStorage.getItem('netlifySiteId') || '';
+
+      document.getElementById('netlifyToken').value = savedToken;
+      document.getElementById('netlifySiteId').value = savedSiteId;
+
+      if (savedToken && savedSiteId) {
+        consultarNetlifyAPI(savedToken, savedSiteId);
       }
     });
 
-    function cerrarSesion() {
-      sessionStorage.removeItem('adminAutenticado');
-      location.reload();
-    }
+    function guardarConfiguracion() {
+      const token = document.getElementById('netlifyToken').value.trim();
+      const siteId = document.getElementById('netlifySiteId').value.trim();
 
-    // OBTENER REGISTROS DESDE API NETLIFY
-    async function cargarDatosNetlify() {
-      try {
-        const formsResponse = await fetch(`https://api.netlify.com/api/v1/sites/${NETLIFY_SITE_ID}/forms`, {
-          headers: { Authorization: `Bearer ${NETLIFY_TOKEN}` }
-        });
-        const forms = await formsResponse.json();
-        
-        if (!forms || forms.length === 0) {
-          document.getElementById('tablaMecanicos').innerHTML = '<tr><td colspan="2" style="text-align:center;">No hay formularios registrados en Netlify.</td></tr>';
-          return;
-        }
-
-        const formId = forms[0].id;
-
-        const subResponse = await fetch(`https://api.netlify.com/api/v1/forms/${formId}/submissions`, {
-          headers: { Authorization: `Bearer ${NETLIFY_TOKEN}` }
-        });
-        const submissions = await subResponse.json();
-
-        datosGlobales = submissions.map(sub => ({
-          Fecha: new Date(sub.created_at).toLocaleDateString(),
-          FechaRaw: new Date(sub.created_at),
-          OT: sub.data.ordenTrabajo || 'N/A',
-          Mecanico: sub.data.mecanico || 'Sin Asignar',
-          Trabajo: sub.data.trabajoRealizar || '',
-          Operacion: sub.data.operacion || '',
-          MaquinaTaller: sub.data.maquinaTaller || '',
-          CodMaq: sub.data.codMaq || '',
-          CentroTrabajo: sub.data.centroTrabajo || '',
-          MaquinaPlanta: sub.data.maquinaSolicitante || '',
-          HoraInicio: sub.data.horaInicio || '',
-          HoraFin: sub.data.horaFin || '',
-          TotalTiempo: sub.data.totalTiempo || '',
-          Observaciones: sub.data.observaciones || ''
-        }));
-
-        renderizarDashboard(datosGlobales);
-
-      } catch (error) {
-        console.error("Error al obtener datos:", error);
-        document.getElementById('tablaMecanicos').innerHTML = '<tr><td colspan="2" style="text-align:center; color:red;">Error al cargar datos. Verifique sus credenciales de Netlify.</td></tr>';
-      }
-    }
-
-    // MOSTRAR DATOS EN PANTALLA
-    function renderizarDashboard(datos) {
-      document.getElementById('totalOrdenes').innerText = datos.length;
-
-      const conteoMecanicos = {};
-      datos.forEach(d => {
-        conteoMecanicos[d.Mecanico] = (conteoMecanicos[d.Mecanico] || 0) + 1;
-      });
-
-      document.getElementById('totalMecanicos').innerText = Object.keys(conteoMecanicos).length;
-
-      const tbody = document.getElementById('tablaMecanicos');
-      tbody.innerHTML = '';
-
-      if (Object.keys(conteoMecanicos).length === 0) {
-        tbody.innerHTML = '<tr><td colspan="2" style="text-align:center;">No hay registros en el rango seleccionado.</td></tr>';
+      if (!token || !siteId) {
+        alert("Por favor ingresa tanto el Token como el Site ID de Netlify.");
         return;
       }
 
-      Object.keys(conteoMecanicos).forEach(mecanico => {
+      localStorage.setItem('netlifyToken', token);
+      localStorage.setItem('netlifySiteId', siteId);
+
+      consultarNetlifyAPI(token, siteId);
+    }
+
+    // OBTENER SUBMISSIONS DE LA API DE NETLIFY
+    async function consultarNetlifyAPI(token, siteId) {
+      const tbody = document.getElementById('tablaReportes');
+      tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;">Cargando datos desde Netlify...</td></tr>';
+
+      try {
+        // 1. Obtener la lista de formularios para encontrar el ID del formulario "otFormNetlify"
+        const formsResponse = await fetch(`https://api.netlify.com/api/v1/sites/${siteId}/forms`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        if (!formsResponse.ok) throw new Error("Error consultando la API. Revisa el Token o Site ID.");
+
+        const forms = await formsResponse.json();
+        // Buscar el formulario específico
+        const otForm = forms.find(f => f.name === 'otFormNetlify' || f.name === 'otForm');
+
+        if (!otForm) {
+          tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; color:red;">No se encontró la bandeja "otFormNetlify". Envía al menos una orden completada desde el taller.</td></tr>';
+          return;
+        }
+
+        // 2. Obtener los envíos/submissions del formulario encontrado
+        const subResponse = await fetch(`https://api.netlify.com/api/v1/forms/${otForm.id}/submissions`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        const submissions = await subResponse.json();
+        ordenesGlobales = submissions;
+
+        renderizarTabla(ordenesGlobales);
+
+      } catch (error) {
+        tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; color:red;">Error: ${error.message}</td></tr>`;
+      }
+    }
+
+    // MOSTRAR DATOS EN LA TABLA CON FILTROS APLICADOS
+    function renderizarTabla(datos) {
+      const tbody = document.getElementById('tablaReportes');
+      tbody.innerHTML = '';
+
+      if (datos.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; color:#64748b;">No hay registros para mostrar.</td></tr>';
+        return;
+      }
+
+      datos.forEach(sub => {
+        const d = sub.data;
+        // Fecha formateada YYYY-MM-DD
+        const fechaEnvio = sub.created_at ? sub.created_at.split('T')[0] : 'N/A';
+
         const fila = `<tr>
-          <td>${mecanico}</td>
-          <td><strong>${conteoMecanicos[mecanico]}</strong></td>
+          <td><strong>${fechaEnvio}</strong></td>
+          <td>${d.ordenTrabajo || 'N/A'}</td>
+          <td>${d.mecanico || 'N/A'}</td>
+          <td>${d.trabajoRealizar || 'N/A'} (${d.operacion || ''})</td>
+          <td>${d.maquinaSolicitante || 'N/A'}</td>
+          <td>${d.horaInicio || ''} - ${d.horaFin || ''}</td>
+          <td><span class="status-badge">${d.totalTiempo || 'N/A'}</span></td>
+          <td>${d.observaciones || '-'}</td>
         </tr>`;
         tbody.innerHTML += fila;
       });
     }
 
-    // FILTRADO POR RANGO DE FECHAS
-    function filtrarDatos() {
-      const desdeVal = document.getElementById('fechaInicio').value;
-      const hastaVal = document.getElementById('fechaFin').value;
+    // LÓGICA DEL FILTRO DE FECHAS Y MECÁNICO
+    function aplicarFiltros() {
+      const desde = document.getElementById('fechaDesde').value;
+      const hasta = document.getElementById('fechaHasta').value;
+      const mecanico = document.getElementById('filtroMecanico').value;
 
-      if (!desdeVal || !hastaVal) {
-        alert("Por favor seleccione fecha de inicio y fin.");
-        return;
-      }
+      const filtrados = ordenesGlobales.filter(sub => {
+        const d = sub.data;
+        const fechaSub = sub.created_at ? sub.created_at.split('T')[0] : '';
 
-      const desde = new Date(desdeVal + "T00:00:00");
-      const hasta = new Date(hastaVal + "T23:59:59");
+        // Filtro Fecha Desde
+        if (desde && fechaSub < desde) return false;
+        // Filtro Fecha Hasta
+        if (hasta && fechaSub > hasta) return false;
+        // Filtro Mecánico
+        if (mecanico && d.mecanico !== mecanico) return false;
 
-      const filtrados = datosGlobales.filter(d => d.FechaRaw >= desde && d.FechaRaw <= hasta);
-      renderizarDashboard(filtrados);
+        return true;
+      });
+
+      renderizarTabla(filtrados);
     }
 
-    function limpiarFiltro() {
-      document.getElementById('fechaInicio').value = '';
-      document.getElementById('fechaFin').value = '';
-      renderizarDashboard(datosGlobales);
-    }
-
-    // DESCARGAR EXCEL COMPLETO
+    // EXPORTAR TABLA A FORMATO EXCEL / CSV
     function exportarExcel() {
-      if (datosGlobales.length === 0) {
-        alert("No hay registros disponibles para exportar.");
+      if (ordenesGlobales.length === 0) {
+        alert("No hay datos para exportar");
         return;
       }
 
-      const datosExcel = datosGlobales.map(({ FechaRaw, ...resto }) => resto);
+      let csvContent = "data:text/csv;charset=utf-8,";
+      csvContent += "Fecha,OT,Mecanico,Trabajo,Operacion,Maquina Taller,Cod Maq,Centro Trabajo,Maquina Solicitante,Hora Inicio,Hora Fin,Tiempo Total,Observaciones\n";
 
-      const hoja = XLSX.utils.json_to_sheet(datosExcel);
-      const libro = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(libro, hoja, "Ordenes_Taller");
+      ordenesGlobales.forEach(sub => {
+        const d = sub.data;
+        const fechaSub = sub.created_at ? sub.created_at.split('T')[0] : 'N/A';
+        
+        const row = [
+          `"${fechaSub}"`,
+          `"${d.ordenTrabajo || ''}"`,
+          `"${d.mecanico || ''}"`,
+          `"${d.trabajoRealizar || ''}"`,
+          `"${d.operacion || ''}"`,
+          `"${d.maquinaTaller || ''}"`,
+          `"${d.codMaq || ''}"`,
+          `"${d.centroTrabajo || ''}"`,
+          `"${d.maquinaSolicitante || ''}"`,
+          `"${d.horaInicio || ''}"`,
+          `"${d.horaFin || ''}"`,
+          `"${d.totalTiempo || ''}"`,
+          `"${(d.observaciones || '').replace(/"/g, '""')}"`
+        ];
+        csvContent += row.join(",") + "\n";
+      });
 
-      XLSX.writeFile(libro, `Reporte_Ordenes_Taller_${new Date().toISOString().slice(0,10)}.xlsx`);
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", `reporte_ordenes_mantenimiento_${new Date().toISOString().split('T')[0]}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
     }
   </script>
-
 </body>
 </html>
