@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Control de Trabajo — Taller de Mantenimiento</title>
+  <style>
+    :root {
+      --bg: #f4f6f9;
+      --card: #ffffff;
+      --primary: #1e293b;
+      --accent: #2563eb;
+      --border: #cbd5e1;
+      --text: #0f172a;
+      --success: #16a34a;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+    }
+    .container {
+      width: 100%;
+      max-width: 850px;
+      background: var(--card);
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      border: 1px solid var(--border);
+      overflow: hidden;
+    }
+    .header {
+      background: var(--primary);
+      color: #fff;
+      padding: 20px;
+      text-align: center;
+    }
+    .header h1 {
+      margin: 0;
+      font-size: 1.4rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .header p {
+      margin: 5px 0 0 0;
+      font-size: 0.85rem;
+      color: #94a3b8;
+    }
+    form {
+      padding: 24px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    .full-width {
+      grid-column: 1 / -1;
+    }
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    label {
+      font-weight: 600;
+      font-size: 0.85rem;
+      color: #334155;
+      text-transform: uppercase;
+    }
+    input, select, textarea {
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 0.95rem;
+      background-color: #f8fafc;
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--accent);
+      background-color: #fff;
+    }
+    textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+    .time-container {
+      display: flex;
+      gap: 8px;
+    }
+    .time-container input {
+      flex: 1;
+    }
+    .btn-time {
+      background-color: #475569;
+      color: white;
+      border: none;
+      padding: 0 12px;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    .btn-time:hover {
+      background-color: #334155;
+    }
+    .btn-submit {
+      grid-column: 1 / -1;
+      background-color: var(--accent);
+      color: white;
+      border: none;
+      padding: 14px;
+      border-radius: 6px;
+      font-weight: 700;
+      font-size: 1rem;
+      cursor: pointer;
+      text-transform: uppercase;
+      transition: background 0.2s;
+      margin-top: 10px;
+    }
+    .btn-submit:hover {
+      background-color: #1d4ed8;
+    }
+    .readonly-input {
+      background-color: #e2e8f0 !important;
+      font-weight: bold;
+    }
+    @media (max-width: 600px) {
+      form {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <div class="header">
+      <h1>Registro Órdenes de Trabajo</h1>
+      <p>Industrias Plasticas Josa</p>
+    </div>
+
+    <form id="otForm">
+      
+      <!-- Orden de trabajo -->
+      <div class="form-group">
+        <label for="ordenTrabajo">Orden de Trabajo (OT)</label>
+        <input type="text" id="ordenTrabajo" name="ordenTrabajo" value="OT/0001" readonly class="readonly-input">
+      </div>
+
+      <!-- Mecánico -->
+      <div class="form-group">
+        <label for="mecanico">Mecánico Asignado</label>
+        <select id="mecanico" name="mecanico" required>
+          <option value="">— Seleccionar Mecánico —</option>
+          <option value="HECTOR VIEJO">HECTOR VIEJO</option>
+          <option value="ANTHONY ZAMBRANO">ANTHONY ZAMBRANO</option>
+          <option value="XAVIER LEON">XAVIER LEON</option>
+          <option value="FERNANDO PIGUAVE">FERNANDO PIGUAVE</option>
+          <option value="ANDRES MORALES">ANDRES MORALES</option>
+          <option value="CRISTOPHER RUSSO">CRISTOPHER RUSSO</option>
+          <option value="BOLIVAR GOYON">BOLIVAR GOYON</option>
+          <option value="MECANICO 1">MECANICO 1</option>
+          <option value="MECANICO 2">MECANICO 2</option>
+        </select>
+      </div>
+
+      <!-- Trabajo a realizar -->
+      <div class="form-group full-width">
+        <label for="trabajoRealizar">Trabajo a Realizar</label>
+        <select id="trabajoRealizar" name="trabajoRealizar" required>
+          <option value="">— Seleccionar Trabajo —</option>
+          <option value="REPARAR">1. REPARAR</option>
+          <option value="LIMPIAR BOQUILLA">2. LIMPIAR BOQUILLA</option>
+          <option value="PERFORAR">3. PERFORAR</option>
+          <option value="ALISTAR MOLDE">4. ALISTAR MOLDE</option>
+          <option value="LIMPIEZA TALLER">5. LIMPIEZA TALLER</option>
+          <option value="FABRICAR">6. FABRICAR</option>
+          <option value="PULIR">7. PULIR</option>
+          <option value="REVISAR">8. REVISAR</option>
+          <option value="SOPORTE GENERAL">9. SOPORTE GENERAL</option>
+        </select>
+      </div>
+
+      <!-- Operación -->
+      <div class="form-group">
+        <label for="operacion">Operación</label>
+        <select id="operacion" name="operacion" required>
+          <option value="">— Seleccionar Operación —</option>
+          <option value="AJUSTE MECANICO">1. AJUSTE MECANICO</option>
+          <option value="AUTOGENA">2. AUTOGENA</option>
+          <option value="CNC">3. CNC</option>
+          <option value="DIBUJO TECNICO">4. DIBUJO TECNICO</option>
+          <option value="ELECTROEROCION">5. ELECTROEROCIÓN</option>
+          <option value="FRESADO">6. FRESADO</option>
+          <option value="LIMPIEZA">7. LIMPIEZA</option>
+          <option value="PULIDO">8. PULIDO</option>
+          <option value="ROSCADO">9. ROSCADO</option>
+          <option value="SOLDADURA">10. SOLDADURA</option>
+          <option value="TORNEADO">11. TORNEADO</option>
+          <option value="MT. ELECTRICO">12. MT. ELECTRICO</option>
+        </select>
+      </div>
+
+      <!-- Máquina del taller -->
+      <div class="form-group">
+        <label for="maquinaTaller">Máquina Taller</label>
+        <select id="maquinaTaller" name="maquinaTaller" required>
+          <option value="">— Seleccionar Máquina Taller —</option>
+          <option value="CNC">1. CNC</option>
+          <option value="DIBUJO 1">2. DIBUJO 1</option>
+          <option value="DIBUJO 2">3. DIBUJO 2</option>
+          <option value="EROCIONADORA 1">4. EROCIONADORA 1</option>
+        </select>
+      </div>
+
+      <!-- Código Máquina Taller -->
+      <div class="form-group">
+        <label for="codMaq">Cód. Máquina Taller (COD-MAQ)</label>
+        <select id="codMaq" name="codMaq" required>
+          <option value="">— Seleccionar COD-MAQ —</option>
+          <option value="CNC #1">CNC #1</option>
+          <option value="DB #1">DB #1</option>
+          <option value="ERO #1">ERO #1</option>
+          <option value="FRE #1">FRE #1</option>
+          <option value="REC #1">REC #1</option>
+        </select>
+      </div>
+
+      <!-- Centro de Trabajo -->
+      <div class="form-group">
+        <label for="centroTrabajo">Centro de Trabajo</label>
+        <select id="centroTrabajo" name="centroTrabajo" required>
+          <option value="">— Seleccionar Centro —</option>
+          <option value="MC01">MC01</option>
+          <option value="MC02">MC02</option>
+          <option value="MC03">MC03</option>
+          <option value="D.T">D.T</option>
+        </select>
+      </div>
+
+      <!-- Máquina Solicitante -->
+      <div class="form-group full-width">
+        <label for="maquinaSolicitante">Máquina Solicitante / Planta</label>
+        <select id="maquinaSolicitante" name="maquinaSolicitante" required>
+          <option value="">— Seleccionar Máquina Planta —</option>
+          <optgroup label="Inyección">
+            <option value="INY-102">INY-102</option>
+          </optgroup>
+          <optgroup label="Soplado">
+            <option value="SOP-F">SOP-F</option>
+          </optgroup>
+        </select>
+      </div>
+
+      <!-- HORA INICIO AUTOMÁTICA -->
+      <div class="form-group">
+        <label for="horaInicio">Hora Inicio Trabajo</label>
+        <div class="time-container">
+          <input type="text" id="horaInicio" name="horaInicio" placeholder="--:--" readonly class="readonly-input">
+          <button type="button" class="btn-time" onclick="marcarInicio()">Iniciar</button>
+        </div>
+      </div>
+
+      <!-- HORA FIN AUTOMÁTICA -->
+      <div class="form-group">
+        <label for="horaFin">Hora Fin Trabajo</label>
+        <div class="time-container">
+          <input type="text" id="horaFin" name="horaFin" placeholder="--:--" readonly class="readonly-input">
+          <button type="button" class="btn-time" onclick="marcarFin()">Finalizar</button>
+        </div>
+      </div>
+
+      <!-- TOTAL DE TIEMPO CALCULADO -->
+      <div class="form-group full-width">
+        <label for="totalTiempo">Total Tiempo Transcurrido</label>
+        <input type="text" id="totalTiempo" name="totalTiempo" placeholder="Calculado automáticamente..." readonly class="readonly-input">
+      </div>
+
+      <!-- CAMPO OBSERVACIONES LIBRE -->
+      <div class="form-group full-width">
+        <label for="observaciones">Observaciones / Novedades</label>
+        <textarea id="observaciones" name="observaciones" placeholder="Escriba aquí detalles adicionales del trabajo realizado..."></textarea>
+      </div>
+
+      <button type="submit" class="btn-submit">Registrar Orden de Trabajo</button>
+
+    </form>
+  </div>
+
+  <!-- SCRIPT DE TIEMPOS AUTOMÁTICOS -->
+  <script>
+    let fechaInicioObj = null;
+    let fechaFinObj = null;
+
+    function obtenerHoraActualTexto(date) {
+      return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    }
+
+    function marcarInicio() {
+      fechaInicioObj = new Date();
+      document.getElementById('horaInicio').value = obtenerHoraActualTexto(fechaInicioObj);
+      calcularDiferencia();
+    }
+
+    function marcarFin() {
+      if (!fechaInicioObj) {
+        alert("Por favor marque primero la Hora de Inicio.");
+        return;
+      }
+      fechaFinObj = new Date();
+      document.getElementById('horaFin').value = obtenerHoraActualTexto(fechaFinObj);
+      calcularDiferencia();
+    }
+
+    function calcularDiferencia() {
+      if (fechaInicioObj && fechaFinObj) {
+        let diffMs = fechaFinObj - fechaInicioObj;
+        
+        if (diffMs < 0) {
+          document.getElementById('totalTiempo').value = "Error: Hora Fin anterior a Hora Inicio";
+          return;
+        }
+
+        let diffMins = Math.floor(diffMs / 60000);
+        let horas = Math.floor(diffMins / 60);
+        let minutos = diffMins % 60;
+
+        let resultado = "";
+        if (horas > 0) {
+          resultado += `${horas} hora(s) `;
+        }
+        resultado += `${minutos} min`;
+
+        document.getElementById('totalTiempo').value = resultado;
+      }
+    }
+  </script>
+
+</body>
+</html>
