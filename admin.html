@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panel Admin — Control de Órdenes</title>
+  <!-- Librería para exportar a Excel de forma gratuita -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <style>
+    :root {
+      --bg: #f8fafc;
+      --card: #ffffff;
+      --primary: #0f172a;
+      --accent: #2563eb;
+      --border: #e2e8f0;
+      --text: #1e293b;
+      --danger: #dc2626;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      margin: 0;
+      padding: 0;
+    }
+
+    /* ESTILOS DE LA PANTALLA DE LOGIN */
+    .login-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(4px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+    .login-card {
+      background: var(--card);
+      padding: 32px;
+      border-radius: 12px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      width: 100%;
+      max-width: 360px;
+      text-align: center;
+    }
+    .login-card h2 {
+      margin-top: 0;
+      font-size: 1.3rem;
+      color: var(--primary);
+    }
+    .login-form {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      margin-top: 20px;
+    }
+    .login-form input {
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 0.95rem;
+      outline: none;
+    }
+    .error-message {
+      color: var(--danger);
+      font-size: 0.85rem;
+      display: none;
+      margin-top: 6px;
+    }
+
+    /* ESTILOS DEL DASHBOARD (OCULTO POR DEFECTO) */
+    .dashboard-container {
+      display: none; /* Se activa tras el login */
+      padding: 20px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .filters {
+      background: var(--card);
+      padding: 16px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      display: flex;
+      gap: 16px;
+      align-items: flex-end;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    .filter-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #64748b;
+      text-transform: uppercase;
+    }
+    input[type="date"] {
+      padding: 8px 12px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      outline: none;
+    }
+    .btn {
+      padding: 9px 16px;
+      border-radius: 6px;
+      border: none;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+    .btn-primary { background: var(--accent); color: white; }
+    .btn-excel { background: #16a34a; color: white; }
+    .btn-logout { background: #64748b; color: white; }
+    
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+    .stat-card {
+      background: var(--card);
+      padding: 20px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+    .stat-card h3 { margin: 0; font-size: 0.85rem; color: #64748b; text-transform: uppercase; }
+    .stat-card .value { font-size: 1.8rem; font-weight: bold; margin-top: 8px; color: var(--primary); }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--card);
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+    th, td {
+      padding: 12px 16px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+    th { background: #f1f5f9; font-size: 0.8rem; text-transform: uppercase; color: #475569; }
+  </style>
+</head>
+<body>
+
+  <!-- VENTANA DE AUTENTICACIÓN (LOGIN) -->
+  <div class="login-modal" id="loginModal">
+    <div class="login-card">
+      <h2>🔒 Acceso Administrativo</h2>
+      <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 0;">Ingrese sus credenciales de supervisor</p>
+      
+      <form class="login-form" id="loginForm">
+        <input type="text" id="userInput" placeholder="Usuario" required autocomplete="off">
+        <input type="password" id="passInput" placeholder="Contraseña" required>
+        <button type="submit" class="btn btn-primary">Ingresar al Dashboard</button>
+      </form>
+      <div class="error-message" id="errorMessage">Usuario o contraseña incorrectos</div>
+    </div>
+  </div>
+
+  <!-- PANEL PRINCIPAL DASHBOARD (SE MUESTRA TRAS AUTENTICAR) -->
+  <div class="dashboard-container" id="dashboardContent">
+    <div class="header">
+      <h2>Dashboard de Administración — Taller</h2>
+      <div>
+        <button class="btn btn-excel" onclick="exportarExcel()">📊 Descargar Reporte Excel</button>
+        <button class="btn btn-logout" onclick="cerrarSesion()">Salir</button>
+      </div>
+    </div>
+
+    <!-- FILTROS DE FECHA -->
+    <div class="filters">
+      <div class="filter-group">
+        <label for="fechaInicio">Desde:</label>
+        <input type="date" id="fechaInicio">
+      </div>
+      <div class="filter-group">
+        <label for="fechaFin">Hasta:</label>
+        <input type="date" id="fechaFin">
+      </div>
+      <button class="btn btn-primary" onclick="filtrarDatos()">Filtrar</button>
+    </div>
+
+    <!-- TARJETAS CON MÉTRICAS -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <h3>Total Órdenes</h3>
+        <div class="value" id="totalOrdenes">0</div>
+      </div>
+      <div class="stat-card">
+        <h3>Mecánicos Activos</h3>
+        <div class="value" id="totalMecanicos">0</div>
+      </div>
+    </div>
+
+    <!-- TABLA RESUMEN POR MECÁNICO -->
+    <h3>Resumen por Mecánico</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Mecánico</th>
+          <th>Total Órdenes Trabajos</th>
+        </tr>
+      </thead>
+      <tbody id="tablaMecanicos">
+        <!-- Datos de prueba o dinámicos -->
+        <tr>
+          <td>HECTOR VIEJO</td>
+          <td>0</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <script>
+    // CREDENCIALES CONFIGURADAS (Puedes cambiarlas aquí)
+    const ADMIN_USER = "admin";
+    const ADMIN_PASS = "12345";
+
+    // CONTROL DE ACCESO
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const user = document.getElementById('userInput').value;
+      const pass = document.getElementById('passInput').value;
+
+      if (user === ADMIN_USER && pass === ADMIN_PASS) {
+        document.getElementById('loginModal').style.display = 'none';
+        document.getElementById('dashboardContent').style.display = 'block';
+        sessionStorage.setItem('adminAutenticado', 'true');
+      } else {
+        document.getElementById('errorMessage').style.display = 'block';
+      }
+    });
+
+    // MANTENER SESIÓN ACTIVA AL NAVEGAR
+    window.addEventListener('DOMContentLoaded', () => {
+      if (sessionStorage.getItem('adminAutenticado') === 'true') {
+        document.getElementById('loginModal').style.display = 'none';
+        document.getElementById('dashboardContent').style.display = 'block';
+      }
+    });
+
+    function cerrarSesion() {
+      sessionStorage.removeItem('adminAutenticado');
+      location.reload();
+    }
+
+    // EXPORTACIÓN A EXCEL
+    function exportarExcel() {
+      let tabla = document.querySelector("table");
+      let wb = XLSX.utils.table_to_book(tabla, { sheet: "Resumen Mecánicos" });
+      XLSX.writeFile(wb, "Reporte_Ordenes_Mantenimiento.xlsx");
+    }
+
+    function filtrarDatos() {
+      // Lógica para filtrar las OTs según el rango de fechas
+    }
+  </script>
+
+</body>
+</html>
