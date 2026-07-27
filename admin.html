@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Panel Admin — Control de Órdenes</title>
-  <!-- Librería para exportar a Excel de forma gratuita -->
+  <!-- Librería para generar y descargar archivos Excel de forma gratuita -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <style>
     :root {
@@ -24,7 +24,7 @@
       padding: 0;
     }
 
-    /* ESTILOS DE LA PANTALLA DE LOGIN */
+    /* PANTALLA DE INICIO DE SESIÓN (LOGIN) */
     .login-modal {
       position: fixed;
       top: 0;
@@ -72,9 +72,9 @@
       margin-top: 6px;
     }
 
-    /* ESTILOS DEL DASHBOARD (OCULTO POR DEFECTO) */
+    /* CONTENEDOR DEL DASHBOARD */
     .dashboard-container {
-      display: none; /* Se activa tras el login */
+      display: none;
       padding: 20px;
       max-width: 1100px;
       margin: 0 auto;
@@ -84,6 +84,12 @@
       justify-content: space-between;
       align-items: center;
       margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .header-buttons {
+      display: flex;
+      gap: 10px;
     }
     .filters {
       background: var(--card);
@@ -120,10 +126,14 @@
       font-weight: 600;
       cursor: pointer;
       font-size: 0.9rem;
+      transition: background 0.2s;
     }
     .btn-primary { background: var(--accent); color: white; }
+    .btn-primary:hover { background: #1d4ed8; }
     .btn-excel { background: #16a34a; color: white; }
+    .btn-excel:hover { background: #15803d; }
     .btn-logout { background: #64748b; color: white; }
+    .btn-logout:hover { background: #475569; }
     
     .stats-grid {
       display: grid;
@@ -158,11 +168,11 @@
 </head>
 <body>
 
-  <!-- VENTANA DE AUTENTICACIÓN (LOGIN) -->
+  <!-- VENTANA LOGIN -->
   <div class="login-modal" id="loginModal">
     <div class="login-card">
       <h2>🔒 Acceso Administrativo</h2>
-      <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 0;">Ingrese sus credenciales de supervisor</p>
+      <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 0;">Ingrese credenciales de supervisor</p>
       
       <form class="login-form" id="loginForm">
         <input type="text" id="userInput" placeholder="Usuario" required autocomplete="off">
@@ -173,11 +183,11 @@
     </div>
   </div>
 
-  <!-- PANEL PRINCIPAL DASHBOARD (SE MUESTRA TRAS AUTENTICAR) -->
+  <!-- PANEL DASHBOARD -->
   <div class="dashboard-container" id="dashboardContent">
     <div class="header">
       <h2>Dashboard de Administración — Taller</h2>
-      <div>
+      <div class="header-buttons">
         <button class="btn btn-excel" onclick="exportarExcel()">📊 Descargar Reporte Excel</button>
         <button class="btn btn-logout" onclick="cerrarSesion()">Salir</button>
       </div>
@@ -194,6 +204,7 @@
         <input type="date" id="fechaFin">
       </div>
       <button class="btn btn-primary" onclick="filtrarDatos()">Filtrar</button>
+      <button class="btn btn-logout" onclick="limpiarFiltro()">Limpiar Filtro</button>
     </div>
 
     <!-- TARJETAS CON MÉTRICAS -->
@@ -209,30 +220,35 @@
     </div>
 
     <!-- TABLA RESUMEN POR MECÁNICO -->
-    <h3>Resumen por Mecánico</h3>
+    <h3>Resumen de Trabajos por Mecánico</h3>
     <table>
       <thead>
         <tr>
           <th>Mecánico</th>
-          <th>Total Órdenes Trabajos</th>
+          <th>Total Órdenes Registradas</th>
         </tr>
       </thead>
       <tbody id="tablaMecanicos">
-        <!-- Datos de prueba o dinámicos -->
         <tr>
-          <td>HECTOR VIEJO</td>
-          <td>0</td>
+          <td colspan="2" style="text-align:center; color:#64748b;">Cargando información...</td>
         </tr>
       </tbody>
     </table>
   </div>
 
+  <!-- SCRIPT DE CONTROL Y CONEXIÓN CON NETLIFY -->
   <script>
-    // CREDENCIALES CONFIGURADAS (Puedes cambiarlas aquí)
+    // CREDENCIALES DE ACCESO AL DASHBOARD
     const ADMIN_USER = "admin";
     const ADMIN_PASS = "12345";
 
-    // CONTROL DE ACCESO
+    // COLOCAR AQUÍ TUS CLAVES DE NETLIFY
+    const NETLIFY_TOKEN = "PEGA_AQUI_TU_PERSONAL_ACCESS_TOKEN";
+    const NETLIFY_SITE_ID = "PEGA_AQUI_TU_SITE_ID";
+
+    let datosGlobales = [];
+
+    // MANEJO DE LOGIN
     document.getElementById('loginForm').addEventListener('submit', function(e) {
       e.preventDefault();
       const user = document.getElementById('userInput').value;
@@ -242,16 +258,17 @@
         document.getElementById('loginModal').style.display = 'none';
         document.getElementById('dashboardContent').style.display = 'block';
         sessionStorage.setItem('adminAutenticado', 'true');
+        cargarDatosNetlify();
       } else {
         document.getElementById('errorMessage').style.display = 'block';
       }
     });
 
-    // MANTENER SESIÓN ACTIVA AL NAVEGAR
     window.addEventListener('DOMContentLoaded', () => {
       if (sessionStorage.getItem('adminAutenticado') === 'true') {
         document.getElementById('loginModal').style.display = 'none';
         document.getElementById('dashboardContent').style.display = 'block';
+        cargarDatosNetlify();
       }
     });
 
@@ -260,15 +277,116 @@
       location.reload();
     }
 
-    // EXPORTACIÓN A EXCEL
-    function exportarExcel() {
-      let tabla = document.querySelector("table");
-      let wb = XLSX.utils.table_to_book(tabla, { sheet: "Resumen Mecánicos" });
-      XLSX.writeFile(wb, "Reporte_Ordenes_Mantenimiento.xlsx");
+    // OBTENER REGISTROS DESDE API NETLIFY
+    async function cargarDatosNetlify() {
+      try {
+        const formsResponse = await fetch(`https://api.netlify.com/api/v1/sites/${NETLIFY_SITE_ID}/forms`, {
+          headers: { Authorization: `Bearer ${NETLIFY_TOKEN}` }
+        });
+        const forms = await formsResponse.json();
+        
+        if (!forms || forms.length === 0) {
+          document.getElementById('tablaMecanicos').innerHTML = '<tr><td colspan="2" style="text-align:center;">No hay formularios registrados en Netlify.</td></tr>';
+          return;
+        }
+
+        const formId = forms[0].id;
+
+        const subResponse = await fetch(`https://api.netlify.com/api/v1/forms/${formId}/submissions`, {
+          headers: { Authorization: `Bearer ${NETLIFY_TOKEN}` }
+        });
+        const submissions = await subResponse.json();
+
+        datosGlobales = submissions.map(sub => ({
+          Fecha: new Date(sub.created_at).toLocaleDateString(),
+          FechaRaw: new Date(sub.created_at),
+          OT: sub.data.ordenTrabajo || 'N/A',
+          Mecanico: sub.data.mecanico || 'Sin Asignar',
+          Trabajo: sub.data.trabajoRealizar || '',
+          Operacion: sub.data.operacion || '',
+          MaquinaTaller: sub.data.maquinaTaller || '',
+          CodMaq: sub.data.codMaq || '',
+          CentroTrabajo: sub.data.centroTrabajo || '',
+          MaquinaPlanta: sub.data.maquinaSolicitante || '',
+          HoraInicio: sub.data.horaInicio || '',
+          HoraFin: sub.data.horaFin || '',
+          TotalTiempo: sub.data.totalTiempo || '',
+          Observaciones: sub.data.observaciones || ''
+        }));
+
+        renderizarDashboard(datosGlobales);
+
+      } catch (error) {
+        console.error("Error al obtener datos:", error);
+        document.getElementById('tablaMecanicos').innerHTML = '<tr><td colspan="2" style="text-align:center; color:red;">Error al cargar datos. Verifique sus credenciales de Netlify.</td></tr>';
+      }
     }
 
+    // MOSTRAR DATOS EN PANTALLA
+    function renderizarDashboard(datos) {
+      document.getElementById('totalOrdenes').innerText = datos.length;
+
+      const conteoMecanicos = {};
+      datos.forEach(d => {
+        conteoMecanicos[d.Mecanico] = (conteoMecanicos[d.Mecanico] || 0) + 1;
+      });
+
+      document.getElementById('totalMecanicos').innerText = Object.keys(conteoMecanicos).length;
+
+      const tbody = document.getElementById('tablaMecanicos');
+      tbody.innerHTML = '';
+
+      if (Object.keys(conteoMecanicos).length === 0) {
+        tbody.innerHTML = '<tr><td colspan="2" style="text-align:center;">No hay registros en el rango seleccionado.</td></tr>';
+        return;
+      }
+
+      Object.keys(conteoMecanicos).forEach(mecanico => {
+        const fila = `<tr>
+          <td>${mecanico}</td>
+          <td><strong>${conteoMecanicos[mecanico]}</strong></td>
+        </tr>`;
+        tbody.innerHTML += fila;
+      });
+    }
+
+    // FILTRADO POR RANGO DE FECHAS
     function filtrarDatos() {
-      // Lógica para filtrar las OTs según el rango de fechas
+      const desdeVal = document.getElementById('fechaInicio').value;
+      const hastaVal = document.getElementById('fechaFin').value;
+
+      if (!desdeVal || !hastaVal) {
+        alert("Por favor seleccione fecha de inicio y fin.");
+        return;
+      }
+
+      const desde = new Date(desdeVal + "T00:00:00");
+      const hasta = new Date(hastaVal + "T23:59:59");
+
+      const filtrados = datosGlobales.filter(d => d.FechaRaw >= desde && d.FechaRaw <= hasta);
+      renderizarDashboard(filtrados);
+    }
+
+    function limpiarFiltro() {
+      document.getElementById('fechaInicio').value = '';
+      document.getElementById('fechaFin').value = '';
+      renderizarDashboard(datosGlobales);
+    }
+
+    // DESCARGAR EXCEL COMPLETO
+    function exportarExcel() {
+      if (datosGlobales.length === 0) {
+        alert("No hay registros disponibles para exportar.");
+        return;
+      }
+
+      const datosExcel = datosGlobales.map(({ FechaRaw, ...resto }) => resto);
+
+      const hoja = XLSX.utils.json_to_sheet(datosExcel);
+      const libro = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(libro, hoja, "Ordenes_Taller");
+
+      XLSX.writeFile(libro, `Reporte_Ordenes_Taller_${new Date().toISOString().slice(0,10)}.xlsx`);
     }
   </script>
 
